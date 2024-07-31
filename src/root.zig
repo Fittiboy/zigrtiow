@@ -141,3 +141,7 @@ pub fn imagePPM(writer: anytype, comptime log: bool) !void {
     }
     if (log) print("\r{s: <26}\n", .{"Done!"});
 }
+
+test {
+    testing.refAllDecls(@import("color.zig"));
+}
