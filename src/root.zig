@@ -5,8 +5,26 @@ const testing = std.testing;
 pub fn Vector3(comptime E: type) type {
     return struct {
         const Self = @This();
-        const V = @Vector(3, E);
+        pub const V = @Vector(3, E);
         vec: V,
+
+        pub fn init(vx: E, vy: E, vz: E) Self {
+            return .{
+                .vec = V{ vx, vy, vz },
+            };
+        }
+
+        pub inline fn x(self: Self) E {
+            return self.vec[0];
+        }
+
+        pub inline fn y(self: Self) E {
+            return self.vec[1];
+        }
+
+        pub inline fn z(self: Self) E {
+            return self.vec[2];
+        }
 
         pub fn lengthSquared(self: Self) E {
             return @reduce(.Add, self.vec * self.vec);
@@ -33,22 +51,37 @@ pub fn Vector3(comptime E: type) type {
             } };
         }
 
+        test x {
+            const vec = Vec3.init(1, 2, 3);
+            try testing.expectApproxEqAbs(1.0, vec.x(), 0.01);
+        }
+
+        test y {
+            const vec = Vec3.init(1, 2, 3);
+            try testing.expectApproxEqAbs(2.0, vec.y(), 0.01);
+        }
+
+        test z {
+            const vec = Vec3.init(1, 2, 3);
+            try testing.expectApproxEqAbs(3.0, vec.z(), 0.01);
+        }
+
         test lengthSquared {
-            const vec = Vec3{ 3, 4, 0 };
+            const vec = Vec3.init(3, 4, 0);
             const len = vec.lengthSquared();
 
             try testing.expectApproxEqAbs(25.0, len, 0.01);
         }
 
         test length {
-            const vec = Vec3{ 3, 4, 0 };
+            const vec = Vec3.init(3, 4, 0);
             const len = vec.length();
 
             try testing.expectApproxEqAbs(5.0, len, 0.01);
         }
 
         test normed {
-            const vec = Vec3{ 112, 90, -1 };
+            const vec = Vec3.init(112, 90, -1);
             const norm = vec.normed();
             const len = norm.length();
 
@@ -56,21 +89,21 @@ pub fn Vector3(comptime E: type) type {
         }
 
         test dot {
-            const left = Vec3{ 1, 2, 3 };
-            const right = Vec3{ 6, 5, 4 };
+            const left = Vec3.init(1, 2, 3);
+            const right = Vec3.init(6, 5, 4);
             const dotted = left.dot(right);
 
             try testing.expectApproxEqAbs(28, dotted, 0.01);
         }
 
         test cross {
-            const u = Vec3{ 1, 2, 3 };
-            const v = Vec3{ 6, 5, 4 };
+            const u = Vec3.init(1, 2, 3);
+            const v = Vec3.init(6, 5, 4);
             const crossed = u.cross(v);
 
-            try testing.expectApproxEqAbs(-7, crossed[0], 0.01);
-            try testing.expectApproxEqAbs(14, crossed[1], 0.01);
-            try testing.expectApproxEqAbs(-7, crossed[2], 0.01);
+            try testing.expectApproxEqAbs(-7, crossed.x(), 0.01);
+            try testing.expectApproxEqAbs(14, crossed.y(), 0.01);
+            try testing.expectApproxEqAbs(-7, crossed.z(), 0.01);
         }
     };
 }
