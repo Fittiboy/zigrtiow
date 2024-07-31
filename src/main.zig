@@ -5,5 +5,5 @@ const testing = std.testing;
 pub fn main() !void {
     var stdout = std.io.getStdOut();
     var buffered = std.io.bufferedWriter(stdout.writer());
-    try rt.imagePPM(buffered.writer());
+    try rt.imagePPM(buffered.writer(), true);
 }
