@@ -1,5 +1,84 @@
 const std = @import("std");
 const print = std.debug.print;
+const testing = std.testing;
+
+pub fn Vector3(comptime E: type) type {
+    return struct {
+        const Self = @This();
+        const V = @Vector(3, E);
+        vec: V,
+
+        pub fn lengthSquared(self: Self) E {
+            return @reduce(.Add, self.vec * self.vec);
+        }
+
+        pub fn length(self: Self) E {
+            return @sqrt(lengthSquared(self));
+        }
+
+        pub fn normed(self: Self) Self {
+            return .{ .vec = self.vec / @as(V, @splat(length(self))) };
+        }
+
+        pub fn dot(u: Self, v: Self) E {
+            return @reduce(.Add, u.vec * v.vec);
+        }
+
+        pub fn cross(u: Self, v: Self) Self {
+            const uv, const vv = .{ u.vec, v.vec };
+            return .{ .vec = .{
+                uv[1] * vv[2] - uv[2] * vv[1],
+                uv[2] * vv[0] - uv[0] * vv[2],
+                uv[0] * vv[1] - uv[1] * vv[0],
+            } };
+        }
+
+        test lengthSquared {
+            const vec = Vec3{ 3, 4, 0 };
+            const len = vec.lengthSquared();
+
+            try testing.expectApproxEqAbs(25.0, len, 0.01);
+        }
+
+        test length {
+            const vec = Vec3{ 3, 4, 0 };
+            const len = vec.length();
+
+            try testing.expectApproxEqAbs(5.0, len, 0.01);
+        }
+
+        test normed {
+            const vec = Vec3{ 112, 90, -1 };
+            const norm = vec.normed();
+            const len = norm.length();
+
+            try testing.expectApproxEqAbs(1.0, len, 0.01);
+        }
+
+        test dot {
+            const left = Vec3{ 1, 2, 3 };
+            const right = Vec3{ 6, 5, 4 };
+            const dotted = left.dot(right);
+
+            try testing.expectApproxEqAbs(28, dotted, 0.01);
+        }
+
+        test cross {
+            const u = Vec3{ 1, 2, 3 };
+            const v = Vec3{ 6, 5, 4 };
+            const crossed = u.cross(v);
+
+            try testing.expectApproxEqAbs(-7, crossed[0], 0.01);
+            try testing.expectApproxEqAbs(14, crossed[1], 0.01);
+            try testing.expectApproxEqAbs(-7, crossed[2], 0.01);
+        }
+    };
+}
+
+const Point3 = Vector3;
+
+const Vec3 = Vector3(f64);
+const P3 = Point3(f64);
 
 pub fn imagePPM(writer: anytype, comptime log: bool) !void {
     // Image constants
@@ -15,13 +94,13 @@ pub fn imagePPM(writer: anytype, comptime log: bool) !void {
     for (0..height) |j| {
         if (log) print("\rScanlines remaining: {d: >5}", .{height - j});
         for (0..width) |i| {
-            const r: f32 = @as(f32, @floatFromInt(i)) / (width - 1);
-            const g: f32 = @as(f32, @floatFromInt(j)) / (height - 1);
-            const b: f32 = 0.0;
+            const r: f64 = @as(f64, @floatFromInt(i)) / (width - 1);
+            const g: f64 = @as(f64, @floatFromInt(j)) / (height - 1);
+            const b: f64 = 0.0;
 
-            const ir: u32 = @intFromFloat(255.999 * r);
-            const ig: u32 = @intFromFloat(255.999 * g);
-            const ib: u32 = @intFromFloat(255.999 * b);
+            const ir: u64 = @intFromFloat(255.999 * r);
+            const ig: u64 = @intFromFloat(255.999 * g);
+            const ib: u64 = @intFromFloat(255.999 * b);
 
             try writer.print("{d: >3} {d: >3} {d: >3}", .{ ir, ig, ib });
             try writer.writeAll(if (i + 1 < width) "\t" else "\n");
