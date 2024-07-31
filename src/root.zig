@@ -1,16 +1,13 @@
-const std = @import("std");
-const testing = std.testing;
-
 pub fn imagePPM(writer: anytype) !void {
     // Image constants
     const width = 256;
     const height = 256;
-    const color_depth = 255;
+    const max_color = 255;
 
     // Render image
 
     // We render the image in the [PPM](https://en.wikipedia.org/wiki/Netpbm#PPM_example) format
-    try writer.print("P3\n{d} {d}\n{d}\n", .{ width, height, color_depth });
+    try writer.print("P3\n{d} {d}\n{d}\n", .{ width, height, max_color });
 
     for (0..height) |j| {
         for (0..width) |i| {
