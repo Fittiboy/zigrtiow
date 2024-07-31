@@ -27,5 +27,5 @@ pub fn imagePPM(writer: anytype, comptime log: bool) !void {
             try writer.writeAll(if (i + 1 < width) "\t" else "\n");
         }
     }
-    if (log) print("\n", .{});
+    if (log) print("\r{s: <26}\n", .{"Done!"});
 }
