@@ -2,6 +2,8 @@ const std = @import("std");
 const print = std.debug.print;
 const testing = std.testing;
 
+const Color = @import("color.zig");
+
 pub fn Vector3(comptime E: type) type {
     return struct {
         const Self = @This();
@@ -127,15 +129,13 @@ pub fn imagePPM(writer: anytype, comptime log: bool) !void {
     for (0..height) |j| {
         if (log) print("\rScanlines remaining: {d: >5}", .{height - j});
         for (0..width) |i| {
-            const r: f64 = @as(f64, @floatFromInt(i)) / (width - 1);
-            const g: f64 = @as(f64, @floatFromInt(j)) / (height - 1);
-            const b: f64 = 0.0;
+            const color = Color.Color.init(
+                @as(f64, @floatFromInt(i)) / (width - 1),
+                @as(f64, @floatFromInt(j)) / (height - 1),
+                0.0,
+            );
 
-            const ir: u64 = @intFromFloat(255.999 * r);
-            const ig: u64 = @intFromFloat(255.999 * g);
-            const ib: u64 = @intFromFloat(255.999 * b);
-
-            try writer.print("{d: >3} {d: >3} {d: >3}", .{ ir, ig, ib });
+            try Color.writeColor(writer, color);
             try writer.writeAll(if (i + 1 < width) "\t" else "\n");
         }
     }
