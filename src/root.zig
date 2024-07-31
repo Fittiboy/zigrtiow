@@ -77,8 +77,8 @@ pub fn Vector3(comptime E: type) type {
 
 const Point3 = Vector3;
 
-const Vec3 = Vector3(f64);
-const P3 = Point3(f64);
+pub const Vec3 = Vector3(f64);
+pub const P3 = Point3(f64);
 
 pub fn imagePPM(writer: anytype, comptime log: bool) !void {
     // Image constants
