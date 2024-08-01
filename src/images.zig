@@ -65,16 +65,11 @@ pub fn imagePPM(
     for (0..height) |j| {
         if (log) print("\rScanlines remaining: {d: >5}", .{height - j});
         for (0..width) |i| {
-            // const color = Color.init(
-            //     @as(f64, @floatFromInt(i)) / (width_f - 0.999),
-            //     @as(f64, @floatFromInt(j)) / (height_f - 0.999),
-            //     0.0,
-            // );
             const pixel_center = pixel00_loc
                 .add(pixel_delta_u.mulScalar(@floatFromInt(i)))
                 .add(pixel_delta_v.mulScalar(@floatFromInt(j)));
-            const ray_direction = pixel_center.sub(camera_center);
-            const ray = Ray{ .orig = camera_center, .dir = ray_direction };
+            const ray_direction = camera_center.directionTo(pixel_center);
+            const ray = Ray.init(camera_center, ray_direction);
             const color = rayColor(ray);
 
             try Colors.writeColor(writer, color);

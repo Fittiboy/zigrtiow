@@ -11,10 +11,10 @@ pub const Ray = struct {
     orig: P3,
     dir: Vec3,
 
-    pub fn init(origin: P3.V, direction: Vec3.V) Self {
+    pub fn init(origin: P3, direction: Vec3) Self {
         return .{
-            .orig = P3{ .vec = origin },
-            .dir = Vec3{ .vec = direction },
+            .orig = origin,
+            .dir = direction,
         };
     }
 
