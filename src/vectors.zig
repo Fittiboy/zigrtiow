@@ -65,7 +65,7 @@ pub fn Vector3(comptime E: type) type {
         }
 
         pub fn lengthSquared(self: Self) E {
-            return @reduce(.Add, self.mul(self).vec);
+            return self.dot(self);
         }
 
         pub fn length(self: Self) E {
@@ -87,6 +87,26 @@ pub fn Vector3(comptime E: type) type {
                 uv[2] * vv[0] - uv[0] * vv[2],
                 uv[0] * vv[1] - uv[1] * vv[0],
             } };
+        }
+
+        pub fn to(self: Self, destination: Self) Self {
+            return destination.sub(self);
+        }
+
+        pub fn distanceTo(self: Self, destination: Self) E {
+            return self.to(destination).length();
+        }
+
+        pub fn directionTo(self: Self, destination: Self) Self {
+            return self.to(destination).normed();
+        }
+
+        test to {
+            const start = Vec3.init(0, 1, 2);
+            const dest = Vec3.init(5, 1, 1);
+            const expected = Vec3.init(5, 0, -1);
+
+            try testing.expectEqualDeep(expected, start.to(dest));
         }
 
         pub fn lerp(self: Self, other: Self, a: anytype) Self {
@@ -232,6 +252,22 @@ pub fn Vector3(comptime E: type) type {
             const expected = Vec3.init(1, 2, 6);
 
             try testing.expectEqualDeep(expected, lerped);
+        }
+
+        test directionTo {
+            const start = Vec3.init(0, 1, 2);
+            const dest = Vec3.init(5, 1, 1);
+            const expected = Vec3.init(5, 0, -1).divScalar(@sqrt(26.0));
+
+            try testing.expectEqualDeep(expected, start.directionTo(dest));
+        }
+
+        test distanceTo {
+            const start = Vec3.init(0, 1, 2);
+            const dest = Vec3.init(5, 1, 1);
+            const expected = @sqrt(26.0);
+
+            try testing.expectApproxEqAbs(expected, start.distanceTo(dest), 0.01);
         }
     };
 }
