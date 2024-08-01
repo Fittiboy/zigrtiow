@@ -2,8 +2,8 @@ const std = @import("std");
 const testing = std.testing;
 
 const root = @import("root.zig");
-const P3 = root.P3;
-const Vec3 = root.Vec3;
+const P3 = root.Vectors.P3;
+const Vec3 = root.Vectors.Vec3;
 
 pub const Ray = struct {
     const Self = @This();
