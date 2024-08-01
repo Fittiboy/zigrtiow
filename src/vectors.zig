@@ -28,7 +28,7 @@ pub fn Vector3(comptime E: type) type {
             return self.vec[1];
         }
 
-        pub fn z(self: Self) E {
+        pub inline fn z(self: Self) E {
             return self.vec[2];
         }
 
