@@ -15,6 +15,7 @@ pub const Rays = @import("rays.zig");
 const Ray = Rays.Ray;
 
 test {
+    testing.refAllDecls(@import("images.zig"));
     testing.refAllDecls(@import("vectors.zig"));
     testing.refAllDecls(@import("colors.zig"));
     testing.refAllDecls(@import("rays.zig"));

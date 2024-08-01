@@ -1,5 +1,6 @@
 const std = @import("std");
 const print = std.debug.print;
+const testing = std.testing;
 
 const Colors = @import("root.zig").Colors;
 const Color = Colors.Color;
@@ -46,4 +47,24 @@ pub fn imagePPM(
         }
     }
     if (log) print("\r{s: <26}\n", .{"Done!"});
+}
+
+test imagePPM {
+    var buf: [59]u8 = undefined;
+    var stream = std.io.fixedBufferStream(&buf);
+    const writer = stream.writer();
+    try imagePPM(writer, 2, 1.0, false);
+
+    var exp_buf: [59]u8 = undefined;
+    var exp_stream = std.io.fixedBufferStream(&exp_buf);
+    const exp_writer = exp_stream.writer();
+    try exp_writer.print("{s}{s}{s}{s}{s}", .{
+        "P3\n",
+        "2 2\n",
+        "255\n",
+        "  0   0   0\t255   0   0\n",
+        "  0 255   0\t255 255   0\n",
+    });
+
+    try testing.expectEqualDeep(exp_buf[0..exp_stream.pos], buf[0..stream.pos]);
 }
