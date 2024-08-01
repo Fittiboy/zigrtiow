@@ -1,5 +1,6 @@
 const std = @import("std");
 const testing = std.testing;
+
 const root = @import("root.zig");
 const Vec3 = root.Vec3;
 
