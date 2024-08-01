@@ -29,7 +29,3 @@ test writeColor {
     const expected = "127 191  63";
     for (expected, buf) |e, f| try testing.expectEqual(e, f);
 }
-
-test {
-    testing.refAllDecls(@This());
-}
