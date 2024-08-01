@@ -6,9 +6,20 @@ const Color = Colors.Color;
 
 pub fn imagePPM(writer: anytype, comptime log: bool) !void {
     // Image constants
-    const width = 256;
-    const height = 256;
+    const aspect_ratio: f64 = 16.0 / 9.0;
+    const width = 400;
     const max_color = 255;
+
+    const height: usize = blk: {
+        const h: usize = @intFromFloat(width / aspect_ratio);
+        break :blk if (h >= 1) h else 1;
+    };
+
+    const viewport_height: f64 = 2.0;
+    // The image's real aspect ratio might not match ideal aspect ratio,
+    // so we use the real value for the viewport aspect ratio.
+    const viewport_width: f64 = viewport_height * (@as(f64, @floatFromInt(width)) / height);
+    _ = viewport_width;
 
     // Render image
 
