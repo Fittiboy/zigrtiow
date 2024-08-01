@@ -32,6 +32,22 @@ pub fn Vector3(comptime E: type) type {
             return self.vec[2];
         }
 
+        pub inline fn add(self: Self, other: Self) Self {
+            return .{ .vec = self.vec + other.vec };
+        }
+
+        pub inline fn sub(self: Self, other: Self) Self {
+            return .{ .vec = self.vec - other.vec };
+        }
+
+        pub inline fn mul(self: Self, other: Self) Self {
+            return .{ .vec = self.vec * other.vec };
+        }
+
+        pub inline fn div(self: Self, other: Self) Self {
+            return .{ .vec = self.vec / other.vec };
+        }
+
         pub fn lengthSquared(self: Self) E {
             return @reduce(.Add, self.vec * self.vec);
         }
@@ -70,6 +86,42 @@ pub fn Vector3(comptime E: type) type {
         test z {
             const vec = Vec3.init(1, 2, 3);
             try testing.expectApproxEqAbs(3.0, vec.z(), 0.01);
+        }
+
+        test add {
+            const u = Vec3.init(1, 2, 3);
+            const v = Vec3.init(4, 5, 6);
+            const sum = u.add(v);
+            const expected = Vec3.init(5, 7, 9);
+
+            try testing.expectEqualDeep(expected, sum);
+        }
+
+        test sub {
+            const u = Vec3.init(1, 2, 3);
+            const v = Vec3.init(4, 5, 6);
+            const diff = u.sub(v);
+            const expected = Vec3.init(-3, -3, -3);
+
+            try testing.expectEqualDeep(expected, diff);
+        }
+
+        test mul {
+            const u = Vec3.init(1, 2, 3);
+            const v = Vec3.init(4, 5, 6);
+            const prod = u.mul(v);
+            const expected = Vec3.init(4, 10, 18);
+
+            try testing.expectEqualDeep(expected, prod);
+        }
+
+        test div {
+            const u = Vec3.init(1, 2, 3);
+            const v = Vec3.init(4, 5, 6);
+            const quot = u.div(v);
+            const expected = Vec3.init(0.25, 0.4, 0.5);
+
+            try testing.expectEqualDeep(expected, quot);
         }
 
         test lengthSquared {
