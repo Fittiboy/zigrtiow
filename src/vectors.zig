@@ -28,44 +28,44 @@ pub fn Vector3(comptime E: type) type {
             return self.vec[1];
         }
 
-        pub inline fn z(self: Self) E {
+        pub fn z(self: Self) E {
             return self.vec[2];
         }
 
-        pub inline fn add(self: Self, other: Self) Self {
+        pub fn add(self: Self, other: Self) Self {
             return .{ .vec = self.vec + other.vec };
         }
 
-        pub inline fn sub(self: Self, other: Self) Self {
+        pub fn sub(self: Self, other: Self) Self {
             return .{ .vec = self.vec - other.vec };
         }
 
-        pub inline fn mul(self: Self, other: Self) Self {
+        pub fn mul(self: Self, other: Self) Self {
             return .{ .vec = self.vec * other.vec };
         }
 
-        pub inline fn div(self: Self, other: Self) Self {
+        pub fn div(self: Self, other: Self) Self {
             return .{ .vec = self.vec / other.vec };
         }
 
-        pub inline fn addScalar(self: Self, scalar: E) Self {
+        pub fn addScalar(self: Self, scalar: E) Self {
             return .{ .vec = self.vec + @as(V, @splat(scalar)) };
         }
 
-        pub inline fn subScalar(self: Self, scalar: E) Self {
+        pub fn subScalar(self: Self, scalar: E) Self {
             return .{ .vec = self.vec - @as(V, @splat(scalar)) };
         }
 
-        pub inline fn mulScalar(self: Self, scalar: E) Self {
+        pub fn mulScalar(self: Self, scalar: E) Self {
             return .{ .vec = self.vec * @as(V, @splat(scalar)) };
         }
 
-        pub inline fn divScalar(self: Self, scalar: E) Self {
+        pub fn divScalar(self: Self, scalar: E) Self {
             return .{ .vec = self.vec / @as(V, @splat(scalar)) };
         }
 
         pub fn lengthSquared(self: Self) E {
-            return @reduce(.Add, self.vec * self.vec);
+            return @reduce(.Add, self.mul(self).vec);
         }
 
         pub fn length(self: Self) E {
@@ -73,7 +73,7 @@ pub fn Vector3(comptime E: type) type {
         }
 
         pub fn normed(self: Self) Self {
-            return .{ .vec = self.vec / @as(V, @splat(length(self))) };
+            return self.divScalar(self.length());
         }
 
         pub fn dot(u: Self, v: Self) E {
