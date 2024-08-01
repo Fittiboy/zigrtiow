@@ -89,6 +89,18 @@ pub fn Vector3(comptime E: type) type {
             } };
         }
 
+        pub fn lerp(self: Self, other: Self, a: anytype) Self {
+            const info = @typeInfo(@TypeOf(a));
+            comptime std.debug.assert(info == .Float or info == .ComptimeFloat);
+            return self
+                .mulScalar(1 - a)
+                .add(other.mulScalar(a));
+        }
+
+        // ***************
+        // *****TESTS*****
+        // ***************
+
         test x {
             const vec = Vec3.init(1, 2, 3);
             try testing.expectApproxEqAbs(1.0, vec.x(), 0.01);
@@ -210,6 +222,16 @@ pub fn Vector3(comptime E: type) type {
             try testing.expectApproxEqAbs(-7, crossed.x(), 0.01);
             try testing.expectApproxEqAbs(14, crossed.y(), 0.01);
             try testing.expectApproxEqAbs(-7, crossed.z(), 0.01);
+        }
+
+        test lerp {
+            const u = Vec3.init(0, 1, 3);
+            const v = Vec3.init(2, 3, 9);
+            const a = 0.5;
+            const lerped = u.lerp(v, a);
+            const expected = Vec3.init(1, 2, 6);
+
+            try testing.expectEqualDeep(expected, lerped);
         }
     };
 }
