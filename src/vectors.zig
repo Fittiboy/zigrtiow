@@ -48,6 +48,22 @@ pub fn Vector3(comptime E: type) type {
             return .{ .vec = self.vec / other.vec };
         }
 
+        pub inline fn addScalar(self: Self, scalar: E) Self {
+            return .{ .vec = self.vec + @as(V, @splat(scalar)) };
+        }
+
+        pub inline fn subScalar(self: Self, scalar: E) Self {
+            return .{ .vec = self.vec - @as(V, @splat(scalar)) };
+        }
+
+        pub inline fn mulScalar(self: Self, scalar: E) Self {
+            return .{ .vec = self.vec * @as(V, @splat(scalar)) };
+        }
+
+        pub inline fn divScalar(self: Self, scalar: E) Self {
+            return .{ .vec = self.vec / @as(V, @splat(scalar)) };
+        }
+
         pub fn lengthSquared(self: Self) E {
             return @reduce(.Add, self.vec * self.vec);
         }
@@ -120,6 +136,38 @@ pub fn Vector3(comptime E: type) type {
             const v = Vec3.init(4, 5, 6);
             const quot = u.div(v);
             const expected = Vec3.init(0.25, 0.4, 0.5);
+
+            try testing.expectEqualDeep(expected, quot);
+        }
+
+        test addScalar {
+            const u = Vec3.init(1, 2, 3);
+            const sum = u.addScalar(3);
+            const expected = Vec3.init(4, 5, 6);
+
+            try testing.expectEqualDeep(expected, sum);
+        }
+
+        test subScalar {
+            const u = Vec3.init(1, 2, 3);
+            const diff = u.subScalar(1);
+            const expected = Vec3.init(0, 1, 2);
+
+            try testing.expectEqualDeep(expected, diff);
+        }
+
+        test mulScalar {
+            const u = Vec3.init(1, 2, 3);
+            const prod = u.mulScalar(3);
+            const expected = Vec3.init(3, 6, 9);
+
+            try testing.expectEqualDeep(expected, prod);
+        }
+
+        test divScalar {
+            const u = Vec3.init(1, 2, 3);
+            const quot = u.divScalar(2);
+            const expected = Vec3.init(0.5, 1, 1.5);
 
             try testing.expectEqualDeep(expected, quot);
         }
