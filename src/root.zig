@@ -4,10 +4,13 @@ const testing = std.testing;
 
 const Colors = @import("colors.zig");
 const Color = Colors.Color;
+const Rays = @import("rays.zig");
+const Ray = Rays.Ray;
 
 pub fn Vector3(comptime E: type) type {
     return struct {
         const Self = @This();
+        pub const Elem = E;
         pub const V = @Vector(3, E);
         vec: V,
 
@@ -145,4 +148,5 @@ pub fn imagePPM(writer: anytype, comptime log: bool) !void {
 
 test {
     testing.refAllDecls(@import("colors.zig"));
+    testing.refAllDecls(@import("rays.zig"));
 }
