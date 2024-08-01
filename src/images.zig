@@ -37,8 +37,8 @@ pub fn imagePPM(
         if (log) print("\rScanlines remaining: {d: >5}", .{height - j});
         for (0..width) |i| {
             const color = Color.init(
-                @as(f64, @floatFromInt(i)) / (width_f - 1),
-                @as(f64, @floatFromInt(j)) / (height_f - 1),
+                @as(f64, @floatFromInt(i)) / (width_f - 0.999),
+                @as(f64, @floatFromInt(j)) / (height_f - 0.999),
                 0.0,
             );
 
@@ -50,21 +50,42 @@ pub fn imagePPM(
 }
 
 test imagePPM {
-    var buf: [59]u8 = undefined;
-    var stream = std.io.fixedBufferStream(&buf);
-    const writer = stream.writer();
-    try imagePPM(writer, 2, 1.0, false);
+    {
+        var buf: [59]u8 = undefined;
+        var stream = std.io.fixedBufferStream(&buf);
+        const writer = stream.writer();
+        try imagePPM(writer, 2, 1.0, false);
 
-    var exp_buf: [59]u8 = undefined;
-    var exp_stream = std.io.fixedBufferStream(&exp_buf);
-    const exp_writer = exp_stream.writer();
-    try exp_writer.print("{s}{s}{s}{s}{s}", .{
-        "P3\n",
-        "2 2\n",
-        "255\n",
-        "  0   0   0\t255   0   0\n",
-        "  0 255   0\t255 255   0\n",
-    });
+        var exp_buf: [59]u8 = undefined;
+        var exp_stream = std.io.fixedBufferStream(&exp_buf);
+        const exp_writer = exp_stream.writer();
+        try exp_writer.print("{s}{s}{s}{s}{s}", .{
+            "P3\n",
+            "2 2\n",
+            "255\n",
+            "  0   0   0\t255   0   0\n",
+            "  0 255   0\t255 255   0\n",
+        });
 
-    try testing.expectEqualDeep(exp_buf[0..exp_stream.pos], buf[0..stream.pos]);
+        try testing.expectEqualDeep(exp_buf[0..exp_stream.pos], buf[0..stream.pos]);
+    }
+
+    {
+        var buf: [35]u8 = undefined;
+        var stream = std.io.fixedBufferStream(&buf);
+        const writer = stream.writer();
+        try imagePPM(writer, 2, 16.0 / 9.0, false);
+
+        var exp_buf: [35]u8 = undefined;
+        var exp_stream = std.io.fixedBufferStream(&exp_buf);
+        const exp_writer = exp_stream.writer();
+        try exp_writer.print("{s}{s}{s}{s}", .{
+            "P3\n",
+            "2 1\n",
+            "255\n",
+            "  0   0   0\t255   0   0\n",
+        });
+
+        try testing.expectEqualDeep(exp_buf[0..exp_stream.pos], buf[0..stream.pos]);
+    }
 }
