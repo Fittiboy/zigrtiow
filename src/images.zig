@@ -10,8 +10,11 @@ const Color = Colors.Color;
 const Ray = root.Rays.Ray;
 
 pub fn rayColor(ray: Ray) Color {
-    _ = ray;
-    return Color.init(0, 0, 0);
+    const unit_dir = ray.dir.normed();
+    const a = 0.5 * (unit_dir.y() + 1.0);
+    const white = Color.init(1.0, 1.0, 1.0);
+    const blue = Color.init(0.5, 0.7, 1.0);
+    return white.lerp(blue, a);
 }
 
 pub fn imagePPM(
