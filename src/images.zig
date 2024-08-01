@@ -23,7 +23,8 @@ pub fn imagePPM(writer: anytype, comptime log: bool) !void {
 
     // Render image
 
-    // We render the image in the [PPM](https://en.wikipedia.org/wiki/Netpbm#PPM_example) format
+    // We render the image in the
+    // [PPM](https://en.wikipedia.org/wiki/Netpbm#PPM_example) format.
     try writer.print("P3\n{d} {d}\n{d}\n", .{ width, height, max_color });
 
     for (0..height) |j| {
