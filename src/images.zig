@@ -4,21 +4,26 @@ const print = std.debug.print;
 const Colors = @import("root.zig").Colors;
 const Color = Colors.Color;
 
-pub fn imagePPM(writer: anytype, comptime log: bool) !void {
+pub fn imagePPM(
+    writer: anytype,
+    width: usize,
+    aspect_ratio: f64,
+    comptime log: bool,
+) !void {
     // Image constants
-    const aspect_ratio: f64 = 16.0 / 9.0;
-    const width = 400;
+    const width_f: f64 = @floatFromInt(width);
     const max_color = 255;
 
     const height: usize = blk: {
-        const h: usize = @intFromFloat(width / aspect_ratio);
+        const h: usize = @intFromFloat(width_f / aspect_ratio);
         break :blk if (h >= 1) h else 1;
     };
+    const height_f: f64 = @floatFromInt(height);
 
     const viewport_height: f64 = 2.0;
     // The image's real aspect ratio might not match ideal aspect ratio,
     // so we use the real value for the viewport aspect ratio.
-    const viewport_width: f64 = viewport_height * (@as(f64, @floatFromInt(width)) / height);
+    const viewport_width: f64 = viewport_height * (width_f / height_f);
     _ = viewport_width;
 
     // Render image
@@ -31,8 +36,8 @@ pub fn imagePPM(writer: anytype, comptime log: bool) !void {
         if (log) print("\rScanlines remaining: {d: >5}", .{height - j});
         for (0..width) |i| {
             const color = Color.init(
-                @as(f64, @floatFromInt(i)) / (width - 1),
-                @as(f64, @floatFromInt(j)) / (height - 1),
+                @as(f64, @floatFromInt(i)) / (width_f - 1),
+                @as(f64, @floatFromInt(j)) / (height_f - 1),
                 0.0,
             );
 
