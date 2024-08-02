@@ -22,7 +22,23 @@ produce a simple image of a red sphere on my gradient.
 
 ![A red sphere on top of a color gradient](samples/pngs/first_red_sphere.png)  
 
-Before moving on, I wanted to add some depth to the very flat sphere,
-so I decided to darken it based on the distance to the camera!  
+### Bonus
+Before moving on to the next chapter, I wanted to add some depth to the very
+flat sphere, so I decided to darken it based on the distance to the camera.  
 
 ![A slightly shaded, red sphere on top of a color gradient](samples/pngs/red_sphere_darken_experiment.png)  
+
+After that, I wanted to have some more color, so I tried turning the
+collision normal into a color.  
+First, I used the absolute value:  
+
+![A blue sphere with green and purple edges](samples/pngs/sphere_normal_abs_color.png)  
+
+Then I added (1, 1, 1) to the normal and divided it by 2:  
+
+![A sphere with soft color transitions](samples/pngs/sphere_normal_shifted_color.png)  
+
+I also tried just norming the vector again after shifting it, but I like
+the previous one better than this:  
+
+![A darker sphere with color transitions](samples/pngs/sphere_normal_shifted_normal_color.png)  
