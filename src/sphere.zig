@@ -13,7 +13,7 @@ radius: E,
 pub const Collision = union(enum) {
     hit: E,
     inside: E,
-    miss: void,
+    miss,
 };
 
 pub fn init(center: Vec3, radius: E) Self {
