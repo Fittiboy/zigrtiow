@@ -15,22 +15,18 @@ pub fn rayColor(ray: Ray) Color {
         Vec3.init(0, 0, -1),
         0.5,
     );
-    const collision = sphere.collisionAt(0.5, null, ray);
-    switch (collision) {
-        .hit => |c| {
-            const point = ray.at(c.t);
-            const light_dir = point.directionTo(light_source);
-            const exposure = (c.normal.dot(light_dir) + 1) / 2;
-            const color_vec = Vec3.init(1, 0, 0);
-            return Color.fromVec3(color_vec.mulScalar(exposure));
-        },
-        else => {
-            const unit_dir = ray.dir.normed();
-            const a = 0.5 * (unit_dir.y() + 1.0);
-            const white = Vec3.init(1.0, 1.0, 1.0);
-            const blue = Vec3.init(0.5, 0.7, 1.0);
-            return Color.fromVec3(white.lerp(blue, a));
-        },
+    if (sphere.collisionAt(0.5, null, ray)) |c| {
+        const point = ray.at(c.t);
+        const light_dir = point.directionTo(light_source);
+        const exposure = (c.normal.dot(light_dir) + 1) / 2;
+        const color_vec = Vec3.init(1, 0, 0);
+        return Color.fromVec3(color_vec.mulScalar(exposure));
+    } else {
+        const unit_dir = ray.dir.normed();
+        const a = 0.5 * (unit_dir.y() + 1.0);
+        const white = Vec3.init(1.0, 1.0, 1.0);
+        const blue = Vec3.init(0.5, 0.7, 1.0);
+        return Color.fromVec3(white.lerp(blue, a));
     }
 }
 

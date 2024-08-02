@@ -8,19 +8,12 @@ pub const Hittable = union(enum) {
     const Self = @This();
     sphere: Sphere,
 
-    pub const Collision = union(enum) {
-        hit: struct {
-            t: E,
-            normal: Vec3,
-        },
-        inside: struct {
-            t: E,
-            normal: Vec3,
-        },
-        miss,
+    pub const Collision = struct {
+        t: E,
+        normal: Vec3,
     };
 
-    pub fn collisionAt(self: Self, t_min: E, t_max: E, ray: Ray) Collision {
+    pub fn collisionAt(self: Self, t_min: E, t_max: E, ray: Ray) ?Collision {
         switch (self) {
             inline else => |hittable| hittable.collisionAt(t_min, t_max, ray),
         }
