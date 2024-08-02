@@ -32,9 +32,8 @@ pub fn collisionAt(self: Self, ray: Ray) Collision {
     if (d < 0) return .{ .miss = {} };
 
     const sqrt = @sqrt(d);
-    const denom = 2 * a;
-    const first = (-b - sqrt) / denom;
-    const second = (-b + sqrt) / denom;
+    const first = (b - sqrt) / a;
+    const second = (b + sqrt) / a;
 
     if (first <= 0 and second <= 0) {
         return .{ .miss = {} };
@@ -59,10 +58,15 @@ fn abDiscriminant(self: Self, ray: Ray) [3]E {
     const from_ray = ray.orig.to(self.center);
 
     const a = ray.dir.lengthSquared();
-    const b = -ray.dir.mulScalar(2).dot(from_ray);
+    // This is not the same b as in the quadratic formula. Since the
+    // actual b is -2td, the equation simplifies a bit!
+    const b = ray.dir.dot(from_ray);
     const c = from_ray.lengthSquared() - (self.radius * self.radius);
 
-    const discriminant = b * b - 4 * a * c;
+    // The discriminant is simplified as well, factoring out 4, the
+    // square root of which cancels out with the 2 in the denominator
+    // of the quadratic equation.
+    const discriminant = b * b - a * c;
     return .{ a, b, discriminant };
 }
 
@@ -145,6 +149,6 @@ test abDiscriminant {
     const a, const b, const d = sphere.abDiscriminant(ray);
 
     try testing.expectApproxEqAbs(1, a, 0.01);
-    try testing.expectApproxEqAbs(-4, b, 0.01);
-    try testing.expectApproxEqAbs(4, d, 0.01);
+    try testing.expectApproxEqAbs(2, b, 0.01);
+    try testing.expectApproxEqAbs(1, d, 0.01);
 }
