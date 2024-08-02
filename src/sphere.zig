@@ -20,7 +20,7 @@ pub fn init(center: Vec3, radius: E) Self {
     };
 }
 
-pub fn collisionAt(self: Self, t_min: ?E, t_max: ?E, ray: Ray) ?Collision {
+pub fn collisionAt(self: Self, t_min: E, t_max: E, ray: Ray) ?Collision {
     const a, const b, const d = self.abDiscriminant(ray);
     if (d < 0) return null;
 
@@ -29,21 +29,15 @@ pub fn collisionAt(self: Self, t_min: ?E, t_max: ?E, ray: Ray) ?Collision {
     const second = (b + sqrt) / a;
 
     var face = Collision.Face.front;
-    const t = if (outOfRange(first, t_min, t_max)) blk: {
-        if (outOfRange(second, t_min, t_max)) return null;
+    const t = if (first < t_min or first > t_max) blk: {
+        if (second < t_min or second > t_max) return null;
         face = .back;
         break :blk second;
     } else first;
     var normal = self.normalAt(ray.at(t));
     if (t == second) normal = normal.mulScalar(-1);
 
-    return Collision{ .t = t, .normal = normal, .face = face };
-}
-
-fn outOfRange(t: E, t_min: ?E, t_max: ?E) bool {
-    if (t_min) |min| if (t < min) return true;
-    if (t_max) |max| if (t > max) return true;
-    return false;
+    return Collision{ .t = t, .p = ray.at(t), .normal = normal, .face = face };
 }
 
 fn normalAt(self: Self, point: P3) Vec3 {
@@ -76,6 +70,7 @@ test collisionAt {
         const coll = sphere.collisionAt(1, 100, ray);
         const expected = Collision{
             .t = 1.0,
+            .p = P3.init(0, 0, -1),
             .normal = Vec3.init(0, 0, 1),
             .face = .front,
         };
@@ -91,6 +86,7 @@ test collisionAt {
         const coll = sphere.collisionAt(1, 100, ray);
         const expected = Collision{
             .t = 1.0,
+            .p = P3.init(0, 0, -1),
             .normal = Vec3.init(0, 0, 1),
             .face = .back,
         };

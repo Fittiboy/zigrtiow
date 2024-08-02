@@ -27,7 +27,7 @@ pub fn clear(self: *Self) !void {
     self.objects.clearRetainingCapacity();
 }
 
-pub fn hit(self: Self, t_min: ?E, t_max: ?E, ray: Ray) ?Collision {
+pub fn hit(self: Self, t_min: E, t_max: E, ray: Ray) ?Collision {
     var collision: ?Collision = null;
     var closest = t_max;
 

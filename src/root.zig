@@ -20,8 +20,8 @@ pub const HittableList = @import("hittable_list.zig");
 
 pub const Sphere = @import("sphere.zig");
 
-const inf: E = std.math.inf(E);
-const pi: E = 3.1415926535897932385;
+pub const inf: E = std.math.inf(E);
+pub const pi: E = std.math.pi;
 
 pub fn degToRad(degrees: E) E {
     return degrees * pi / 180.0;

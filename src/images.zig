@@ -1,4 +1,5 @@
 const std = @import("std");
+const Allocator = std.mem.Allocator;
 const print = std.debug.print;
 const testing = std.testing;
 
@@ -7,20 +8,18 @@ const Vec3 = root.Vec3;
 const P3 = root.P3;
 const Color = root.Color;
 const Ray = root.Ray;
+const Hittable = root.Hittable;
+const HittableList = root.HittableList;
 const Sphere = root.Sphere;
 
-pub fn rayColor(ray: Ray) Color {
-    const light_source = Vec3.init(10, 10, -0.5);
-    const sphere = Sphere.init(
-        Vec3.init(0, 0, -1),
-        0.5,
-    );
-    if (sphere.collisionAt(0.5, null, ray)) |c| {
-        const point = ray.at(c.t);
-        const light_dir = point.directionTo(light_source);
-        const exposure = (c.normal.dot(light_dir) + 1) / 2;
-        const color_vec = Vec3.init(1, 0, 0);
-        return Color.fromVec3(color_vec.mulScalar(exposure));
+pub fn rayColor(ray: Ray, world: HittableList) Color {
+    // const light_source = Vec3.init(10, 10, -0.5);
+    if (world.hit(0, root.inf, ray)) |c| {
+        // const light_dir = c.p.directionTo(light_source);
+        // const exposure = (c.normal.dot(light_dir) + 1) / 2;
+        // const color_vec = Vec3.init(1, 0, 0);
+        // return Color.fromVec3(color_vec.mulScalar(exposure));
+        return Color.fromVec3(c.normal.addScalar(1).divScalar(2));
     } else {
         const unit_dir = ray.dir.normed();
         const a = 0.5 * (unit_dir.y() + 1.0);
@@ -31,6 +30,7 @@ pub fn rayColor(ray: Ray) Color {
 }
 
 pub fn imagePPM(
+    allocator: Allocator,
     writer: anytype,
     width: usize,
     aspect_ratio: f64,
@@ -45,6 +45,19 @@ pub fn imagePPM(
         break :blk if (h >= 1) h else 1;
     };
     const height_f: f64 = @floatFromInt(height);
+
+    // World
+
+    var world = try HittableList.init(allocator);
+    defer world.deinit();
+    try world.add(Hittable.initSphere(
+        Vec3.init(0, 0, -1),
+        0.5,
+    ));
+    try world.add(Hittable.initSphere(
+        Vec3.init(0, -100.5, -1),
+        100,
+    ));
 
     // Camera
 
@@ -83,7 +96,7 @@ pub fn imagePPM(
                 .add(pixel_delta_v.mulScalar(@floatFromInt(j)));
             const ray_direction = camera_center.to(pixel_center);
             const ray = Ray.init(camera_center, ray_direction);
-            const color = rayColor(ray);
+            const color = rayColor(ray, world);
 
             try color.writeTo(writer);
             try writer.writeAll(if (i + 1 < width) "\t" else "\n");

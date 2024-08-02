@@ -4,6 +4,7 @@ const testing = std.testing;
 const root = @import("root.zig");
 const E = root.E;
 const Vec3 = root.Vec3;
+const P3 = root.P3;
 const Ray = root.Ray;
 const Sphere = root.Sphere;
 
@@ -18,11 +19,12 @@ pub const Hittable = union(enum) {
     pub const Collision = struct {
         pub const Face = enum { front, back };
         t: E,
+        p: P3,
         normal: Vec3,
         face: Face,
     };
 
-    pub fn collisionAt(self: Self, t_min: ?E, t_max: ?E, ray: Ray) ?Collision {
+    pub fn collisionAt(self: Self, t_min: E, t_max: E, ray: Ray) ?Collision {
         switch (self) {
             inline else => |hittable| return hittable.collisionAt(t_min, t_max, ray),
         }
