@@ -16,7 +16,16 @@ pub const Ray = @import("ray.zig");
 pub const Hittable = @import("hittable.zig").Hittable;
 pub const Collision = Hittable.Collision;
 
+pub const HittableList = @import("hittable_list.zig");
+
 pub const Sphere = @import("sphere.zig");
+
+const inf: E = std.math.inf(E);
+const pi: E = 3.1415926535897932385;
+
+pub fn degToRad(degrees: E) E {
+    return degrees * pi / 180.0;
+}
 
 test {
     testing.refAllDecls(@import("images.zig"));
@@ -24,5 +33,6 @@ test {
     testing.refAllDecls(@import("color.zig"));
     testing.refAllDecls(@import("ray.zig"));
     testing.refAllDecls(@import("hittable.zig"));
+    testing.refAllDecls(@import("hittable_list.zig"));
     testing.refAllDecls(@import("sphere.zig"));
 }
