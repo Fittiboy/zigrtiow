@@ -17,9 +17,8 @@ pub fn init(origin: P3, direction: Vec3) Self {
     };
 }
 
-pub fn at(self: Self, t: E) P3.V {
-    const t_vec: Vec3.V = @splat(t);
-    return self.orig.vec + t_vec * self.dir.vec;
+pub fn at(self: Self, t: E) P3 {
+    return self.orig.add(self.dir.mulScalar(t));
 }
 
 test at {
@@ -29,7 +28,7 @@ test at {
             .{ .vec = .{ 0, 1, 0 } },
         );
         const pos = ray.at(1);
-        const expected = .{ 1, 1, 1 };
+        const expected = Vec3.init(1, 1, 1);
 
         try testing.expectEqualDeep(expected, pos);
     }
@@ -40,7 +39,7 @@ test at {
             .{ .vec = .{ -1, -1, 0 } },
         );
         const pos = ray.at(1);
-        const expected = .{ 0, -1, 1 };
+        const expected = Vec3.init(0, -1, 1);
 
         try testing.expectEqualDeep(expected, pos);
     }
