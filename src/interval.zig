@@ -8,14 +8,16 @@ pub const universe = Self.init(-inf, inf);
 const Self = @This();
 min: E,
 max: E,
-size: E,
 
 pub fn init(min: E, max: E) Self {
     return .{
         .min = min,
         .max = max,
-        .size = max - min,
     };
+}
+
+pub fn size(self: Self) E {
+    return self.max - self.min;
 }
 
 pub fn contains(self: Self, x: E) bool {
