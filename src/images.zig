@@ -3,18 +3,17 @@ const print = std.debug.print;
 const testing = std.testing;
 
 const root = @import("root.zig");
-const Vec3 = root.Vectors.Vec3;
-const P3 = root.Vectors.P3;
-const Colors = root.Colors;
-const Color = Colors.Color;
-const Ray = root.Rays.Ray;
+const Vec3 = root.Vec3;
+const P3 = root.P3;
+const Color = root.Color;
+const Ray = root.Ray;
 
 pub fn rayColor(ray: Ray) Color {
     const unit_dir = ray.dir.normed();
     const a = 0.5 * (unit_dir.y() + 1.0);
-    const white = Color.init(1.0, 1.0, 1.0);
-    const blue = Color.init(0.5, 0.7, 1.0);
-    return white.lerp(blue, a);
+    const white = Vec3.init(1.0, 1.0, 1.0);
+    const blue = Vec3.init(0.5, 0.7, 1.0);
+    return Color.fromVec3(white.lerp(blue, a));
 }
 
 pub fn imagePPM(
@@ -72,7 +71,7 @@ pub fn imagePPM(
             const ray = Ray.init(camera_center, ray_direction);
             const color = rayColor(ray);
 
-            try Colors.writeColor(writer, color);
+            try color.writeColor(writer);
             try writer.writeAll(if (i + 1 < width) "\t" else "\n");
         }
     }
