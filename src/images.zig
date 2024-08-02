@@ -71,7 +71,7 @@ pub fn imagePPM(
             const ray = Ray.init(camera_center, ray_direction);
             const color = rayColor(ray);
 
-            try color.writeColor(writer);
+            try color.writeTo(writer);
             try writer.writeAll(if (i + 1 < width) "\t" else "\n");
         }
     }

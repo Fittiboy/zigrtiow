@@ -2,6 +2,8 @@ const std = @import("std");
 const print = std.debug.print;
 const testing = std.testing;
 
+pub const E = f64;
+
 pub const Images = @import("images.zig");
 
 pub const Vec3 = @import("vector.zig");

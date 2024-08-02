@@ -6,7 +6,7 @@ const Vec3 = root.Vec3;
 const P3 = root.P3;
 
 const Self = @This();
-const E = Vec3.E;
+const E = root.E;
 orig: P3,
 dir: Vec3,
 

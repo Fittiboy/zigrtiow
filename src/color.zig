@@ -21,7 +21,7 @@ pub fn fromVec3(vec: Vec3) Self {
     };
 }
 
-pub fn writeColor(self: Self, writer: anytype) !void {
+pub fn writeTo(self: Self, writer: anytype) !void {
     // Translate the [0, 1] floats into bytes
     const rbyte: u8 = @intFromFloat(255.999 * self.r);
     const gbyte: u8 = @intFromFloat(255.999 * self.g);
@@ -30,12 +30,12 @@ pub fn writeColor(self: Self, writer: anytype) !void {
     try writer.print("{d: >3} {d: >3} {d: >3}", .{ rbyte, gbyte, bbyte });
 }
 
-test writeColor {
+test writeTo {
     const color = Self.init(0.5, 0.75, 0.25);
     var buf: [11]u8 = undefined;
     var fbs = std.io.fixedBufferStream(&buf);
     const writer = fbs.writer();
-    try color.writeColor(writer);
+    try color.writeTo(writer);
 
     const expected = "127 191  63";
     for (expected, buf) |e, f| try testing.expectEqual(e, f);
