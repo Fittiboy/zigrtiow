@@ -7,6 +7,7 @@ const Vec3 = root.Vec3;
 const P3 = root.P3;
 const Ray = root.Ray;
 const Sphere = root.Sphere;
+const Interval = root.Interval;
 
 pub const Hittable = union(enum) {
     const Self = @This();
@@ -24,9 +25,9 @@ pub const Hittable = union(enum) {
         face: Face,
     };
 
-    pub fn collisionAt(self: Self, t_min: E, t_max: E, ray: Ray) ?Collision {
+    pub fn collisionAt(self: Self, interval: Interval, ray: Ray) ?Collision {
         switch (self) {
-            inline else => |hittable| return hittable.collisionAt(t_min, t_max, ray),
+            inline else => |hittable| return hittable.collisionAt(interval, ray),
         }
     }
 

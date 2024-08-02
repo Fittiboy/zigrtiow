@@ -11,10 +11,11 @@ const Ray = root.Ray;
 const Hittable = root.Hittable;
 const HittableList = root.HittableList;
 const Sphere = root.Sphere;
+const Interval = root.Interval;
 
 pub fn rayColor(ray: Ray, world: HittableList) Color {
     // const light_source = Vec3.init(10, 10, -0.5);
-    if (world.hit(0, root.inf, ray)) |c| {
+    if (world.hit(Interval.init(0, root.inf), ray)) |c| {
         // const light_dir = c.p.directionTo(light_source);
         // const exposure = (c.normal.dot(light_dir) + 1) / 2;
         // const color_vec = Vec3.init(1, 0, 0);

@@ -6,6 +6,7 @@ const Vec3 = root.Vec3;
 const P3 = root.P3;
 const Ray = root.Ray;
 const Collision = root.Collision;
+const Interval = root.Interval;
 
 const E = root.E;
 const Self = @This();
@@ -20,7 +21,7 @@ pub fn init(center: Vec3, radius: E) Self {
     };
 }
 
-pub fn collisionAt(self: Self, t_min: E, t_max: E, ray: Ray) ?Collision {
+pub fn collisionAt(self: Self, interval: Interval, ray: Ray) ?Collision {
     const a, const b, const d = self.abDiscriminant(ray);
     if (d < 0) return null;
 
@@ -29,8 +30,8 @@ pub fn collisionAt(self: Self, t_min: E, t_max: E, ray: Ray) ?Collision {
     const second = (b + sqrt) / a;
 
     var face = Collision.Face.front;
-    const t = if (first < t_min or first > t_max) blk: {
-        if (second < t_min or second > t_max) return null;
+    const t = if (!interval.surrounds(first)) blk: {
+        if (!interval.surrounds(second)) return null;
         face = .back;
         break :blk second;
     } else first;
@@ -67,7 +68,7 @@ test collisionAt {
         const origin = Vec3.init(0, 0, 0);
         const dir = Vec3.init(0, 0, -1);
         const ray = Ray.init(origin, dir);
-        const coll = sphere.collisionAt(1, 100, ray);
+        const coll = sphere.collisionAt(Interval.init(1, 100), ray);
         const expected = Collision{
             .t = 1.0,
             .p = P3.init(0, 0, -1),
@@ -83,7 +84,7 @@ test collisionAt {
         const origin = Vec3.init(0, 0, 0);
         const dir = Vec3.init(0, 0, -1);
         const ray = Ray.init(origin, dir);
-        const coll = sphere.collisionAt(1, 100, ray);
+        const coll = sphere.collisionAt(Interval.init(1, 100), ray);
         const expected = Collision{
             .t = 1.0,
             .p = P3.init(0, 0, -1),
@@ -99,7 +100,7 @@ test collisionAt {
         const origin = Vec3.init(0, 0, 0);
         const dir = Vec3.init(0, 0, -1);
         const ray = Ray.init(origin, dir);
-        const coll = sphere.collisionAt(1, 100, ray);
+        const coll = sphere.collisionAt(Interval.init(1, 100), ray);
 
         try testing.expectEqual(null, coll);
     }

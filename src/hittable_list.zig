@@ -7,6 +7,7 @@ const E = root.E;
 const Ray = root.Ray;
 const Hittable = root.Hittable;
 const Collision = root.Collision;
+const Interval = root.Interval;
 
 const Self = @This();
 objects: std.ArrayList(Hittable),
@@ -27,13 +28,13 @@ pub fn clear(self: *Self) !void {
     self.objects.clearRetainingCapacity();
 }
 
-pub fn hit(self: Self, t_min: E, t_max: E, ray: Ray) ?Collision {
+pub fn hit(self: Self, interval: Interval, ray: Ray) ?Collision {
     var collision: ?Collision = null;
-    var closest = t_max;
+    var closest = interval;
 
     for (self.objects.items) |object| {
-        if (object.collisionAt(t_min, closest, ray)) |coll| {
-            closest = coll.t;
+        if (object.collisionAt(closest, ray)) |coll| {
+            closest.max = coll.t;
             collision = coll;
         }
     }

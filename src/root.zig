@@ -20,6 +20,8 @@ pub const HittableList = @import("hittable_list.zig");
 
 pub const Sphere = @import("sphere.zig");
 
+pub const Interval = @import("interval.zig");
+
 pub const inf: E = std.math.inf(E);
 pub const pi: E = std.math.pi;
 
@@ -35,4 +37,5 @@ test {
     testing.refAllDecls(@import("hittable.zig"));
     testing.refAllDecls(@import("hittable_list.zig"));
     testing.refAllDecls(@import("sphere.zig"));
+    testing.refAllDecls(@import("interval.zig"));
 }
