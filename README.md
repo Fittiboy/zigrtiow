@@ -42,3 +42,8 @@ I also tried just norming the vector again after shifting it, but I like
 the previous one better than this:  
 
 ![A darker sphere with color transitions](samples/pngs/sphere_normal_shifted_normal_color.png)  
+
+### Bonus Bonus
+Couldn't resist and wanted to see if I could add a naive light source. I could.  
+
+![A red sphere, lit softly from the top right](samples/pngs/red_lit_sphere.png)  

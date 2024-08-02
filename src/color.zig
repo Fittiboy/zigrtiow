@@ -15,9 +15,9 @@ pub fn init(r: f64, g: f64, b: f64) Self {
 
 pub fn fromVec3(vec: Vec3) Self {
     return .{
-        .r = vec.x(),
-        .g = vec.y(),
-        .b = vec.z(),
+        .r = @min(vec.x(), 1),
+        .g = @min(vec.y(), 1),
+        .b = @min(vec.z(), 1),
     };
 }
 

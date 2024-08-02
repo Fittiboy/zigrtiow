@@ -75,6 +75,22 @@ pub fn abs(self: Self) Self {
     return Self{ .vec = @abs(self.vec) };
 }
 
+pub fn positive(self: Self) Self {
+    return Self.init(
+        @max(self.x(), 0),
+        @max(self.y(), 0),
+        @max(self.z(), 0),
+    );
+}
+
+pub fn negative(self: Self) Self {
+    return Self.init(
+        @min(self.x(), 0),
+        @min(self.y(), 0),
+        @min(self.z(), 0),
+    );
+}
+
 pub fn dot(u: Self, v: Self) E {
     return @reduce(.Add, u.vec * v.vec);
 }
@@ -230,6 +246,20 @@ test abs {
     const pos = vec.abs();
 
     try testing.expectEqualDeep(Self.init(112, 90, 1), pos);
+}
+
+test positive {
+    const vec = Self.init(1, 0, -5);
+    const expected = Self.init(1, 0, 0);
+
+    try testing.expectEqualDeep(expected, vec.positive());
+}
+
+test negative {
+    const vec = Self.init(1, 0, -5);
+    const expected = Self.init(0, 0, -5);
+
+    try testing.expectEqualDeep(expected, vec.negative());
 }
 
 test dot {

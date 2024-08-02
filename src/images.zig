@@ -10,6 +10,7 @@ const Ray = root.Ray;
 const Sphere = root.Sphere;
 
 pub fn rayColor(ray: Ray) Color {
+    const light_source = Vec3.init(10, 10, -0.5);
     const sphere = Sphere.init(
         Vec3.init(0, 0, -1),
         0.5,
@@ -17,8 +18,11 @@ pub fn rayColor(ray: Ray) Color {
     const collision = sphere.collisionAt(ray);
     switch (collision) {
         .hit => |c| {
-            const color_vec = c.normal.add(Vec3.init(1, 1, 1)).divScalar(2);
-            return Color.fromVec3(color_vec);
+            const point = ray.at(c.t);
+            const light_dir = point.directionTo(light_source);
+            const exposure = (c.normal.dot(light_dir) + 1) / 2;
+            const color_vec = Vec3.init(1, 0, 0);
+            return Color.fromVec3(color_vec.mulScalar(exposure));
         },
         else => {
             const unit_dir = ray.dir.normed();
