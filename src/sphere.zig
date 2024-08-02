@@ -28,12 +28,16 @@ pub fn collisionAt(self: Self, t_min: ?E, t_max: ?E, ray: Ray) ?Collision {
     const first = (b - sqrt) / a;
     const second = (b + sqrt) / a;
 
+    var face = Collision.Face.front;
     const t = if (outOfRange(first, t_min, t_max)) blk: {
         if (outOfRange(second, t_min, t_max)) return null;
+        face = .back;
         break :blk second;
     } else first;
+    var normal = self.normalAt(ray.at(t));
+    if (t == second) normal = normal.mulScalar(-1);
 
-    return Collision{ .t = t, .normal = self.normalAt(ray.at(t)) };
+    return Collision{ .t = t, .normal = normal, .face = face };
 }
 
 fn outOfRange(t: E, t_min: ?E, t_max: ?E) bool {
@@ -73,6 +77,7 @@ test collisionAt {
         const expected = Collision{
             .t = 1.0,
             .normal = Vec3.init(0, 0, 1),
+            .face = .front,
         };
 
         try testing.expectEqual(expected, coll);
@@ -86,7 +91,8 @@ test collisionAt {
         const coll = sphere.collisionAt(1, 100, ray);
         const expected = Collision{
             .t = 1.0,
-            .normal = Vec3.init(0, 0, -1),
+            .normal = Vec3.init(0, 0, 1),
+            .face = .back,
         };
 
         try testing.expectEqual(expected, coll);

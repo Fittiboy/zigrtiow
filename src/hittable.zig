@@ -9,8 +9,10 @@ pub const Hittable = union(enum) {
     sphere: Sphere,
 
     pub const Collision = struct {
+        pub const Face = enum { front, back };
         t: E,
         normal: Vec3,
+        face: Face,
     };
 
     pub fn collisionAt(self: Self, t_min: E, t_max: E, ray: Ray) ?Collision {
