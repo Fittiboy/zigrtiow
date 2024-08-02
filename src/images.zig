@@ -7,8 +7,15 @@ const Vec3 = root.Vec3;
 const P3 = root.P3;
 const Color = root.Color;
 const Ray = root.Ray;
+const Sphere = root.Sphere;
 
 pub fn rayColor(ray: Ray) Color {
+    const sphere = Sphere.init(
+        Vec3.init(0, 0, -1),
+        0.5,
+    );
+    if (sphere.hitBy(ray)) return Color.init(1, 0, 0);
+
     const unit_dir = ray.dir.normed();
     const a = 0.5 * (unit_dir.y() + 1.0);
     const white = Vec3.init(1.0, 1.0, 1.0);
