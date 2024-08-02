@@ -47,3 +47,17 @@ the previous one better than this:
 Couldn't resist and wanted to see if I could add a naive light source. I could.  
 
 ![A red sphere, lit softly from the top right](samples/pngs/red_lit_sphere.png)  
+
+## 6. Surface Normals and Multiple Objects
+Turns out chapter 6 wanted me to do what I already did at the end of
+chapter 5 on my own!  
+
+Later, a list of renderable objects was introduced, allowing me to have
+multiple objects in the image at the same time!  
+
+![A small sphere hovering over a large sphere](samples/pngs/multiple_spheres.png)  
+
+Before I did that, I actually made two red spheres using my simple light
+source.  
+
+![A small and a large sphere, softly lit from above](samples/pngs/two_shaded_red_spheres.png)  
