@@ -15,7 +15,7 @@ pub fn rayColor(ray: Ray) Color {
         Vec3.init(0, 0, -1),
         0.5,
     );
-    const collision = sphere.collisionAt(ray);
+    const collision = sphere.collisionAt(0.5, null, ray);
     switch (collision) {
         .hit => |c| {
             const point = ray.at(c.t);
@@ -85,7 +85,7 @@ pub fn imagePPM(
             const pixel_center = pixel00_loc
                 .add(pixel_delta_u.mulScalar(@floatFromInt(i)))
                 .add(pixel_delta_v.mulScalar(@floatFromInt(j)));
-            const ray_direction = camera_center.directionTo(pixel_center);
+            const ray_direction = camera_center.to(pixel_center);
             const ray = Ray.init(camera_center, ray_direction);
             const color = rayColor(ray);
 

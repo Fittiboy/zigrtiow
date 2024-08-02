@@ -17,9 +17,9 @@ pub const Hittable = union(enum) {
         miss,
     };
 
-    pub fn collisionAt(self: Self, ray: Ray) Collision {
+    pub fn collisionAt(self: Self, t_min: E, t_max: E, ray: Ray) Collision {
         switch (self) {
-            inline else => |hittable| hittable.collisionAt(ray),
+            inline else => |hittable| hittable.collisionAt(t_min, t_max, ray),
         }
     }
 

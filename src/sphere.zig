@@ -19,7 +19,7 @@ pub fn init(center: Vec3, radius: E) Self {
     };
 }
 
-pub fn collisionAt(self: Self, ray: Ray) Collision {
+pub fn collisionAt(self: Self, t_min: ?E, t_max: ?E, ray: Ray) Collision {
     const a, const b, const d = self.abDiscriminant(ray);
     if (d < 0) return .{ .miss = {} };
 
@@ -27,15 +27,18 @@ pub fn collisionAt(self: Self, ray: Ray) Collision {
     const first = (b - sqrt) / a;
     const second = (b + sqrt) / a;
 
-    if (first <= 0 and second <= 0) {
-        return .{ .miss = {} };
-    } else if (first <= 0) {
-        return .{ .inside = second };
-    } else return .{ .hit = .{
-        .t = first,
-        .normal = self.normalAt(ray.at(first)),
-    } };
-}
+    const first_after_min = if (t_min) |t| first >= t else true;
+    const first_before_max = if (t_max) |t| first <= t else true;
+    const first_hit = (first_after_min and first_before_max);
+
+    if (first_hit) {
+        const normal = self.normalAt(ray.at(first));
+        return .{ .hit = .{ .t = first, .normal = normal } };
+    }
+
+    var second_hit = if (t_min) |t| second >= t else true;
+    if (second_hit) second_hit = if (t_max) |t| second <= t else true;
+    return if (second_hit) .{ .inside = second } else .{ .miss = {} };
 
 pub fn hitBy(self: Self, ray: Ray) bool {
     _, _, const d = self.abDiscriminant(ray);
@@ -69,7 +72,7 @@ test collisionAt {
         const origin = Vec3.init(0, 0, 0);
         const dir = Vec3.init(0, 0, -1);
         const ray = Ray.init(origin, dir);
-        const coll = sphere.collisionAt(ray);
+        const coll = sphere.collisionAt(1, 100, ray);
         const expected = Collision{ .hit = .{
             .t = 1.0,
             .normal = Vec3.init(0, 0, 1),
@@ -83,7 +86,7 @@ test collisionAt {
         const origin = Vec3.init(0, 0, 0);
         const dir = Vec3.init(0, 0, -1);
         const ray = Ray.init(origin, dir);
-        const coll = sphere.collisionAt(ray);
+        const coll = sphere.collisionAt(1, 100, ray);
 
         try testing.expectEqual(Collision{ .inside = 1.0 }, coll);
     }
@@ -93,7 +96,7 @@ test collisionAt {
         const origin = Vec3.init(0, 0, 0);
         const dir = Vec3.init(0, 0, -1);
         const ray = Ray.init(origin, dir);
-        const coll = sphere.collisionAt(ray);
+        const coll = sphere.collisionAt(1, 100, ray);
 
         try testing.expectEqual(Collision{ .miss = {} }, coll);
     }
