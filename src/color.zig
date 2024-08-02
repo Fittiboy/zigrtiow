@@ -1,8 +1,10 @@
 const std = @import("std");
 const testing = std.testing;
+const assert = std.debug.assert;
 
 const root = @import("root.zig");
 const Vec3 = root.Vec3;
+const Interval = root.Interval;
 
 const Self = @This();
 r: f64,
@@ -10,6 +12,8 @@ g: f64,
 b: f64,
 
 pub fn init(r: f64, g: f64, b: f64) Self {
+    const zto = Interval.init(0, 1);
+    std.debug.assert(zto.contains(r) and zto.contains(g) and zto.contains(b));
     return .{ .r = r, .g = g, .b = b };
 }
 
