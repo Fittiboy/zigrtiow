@@ -71,6 +71,10 @@ pub fn normed(self: Self) Self {
     return self.divScalar(self.length());
 }
 
+pub fn abs(self: Self) Self {
+    return Self{ .vec = @abs(self.vec) };
+}
+
 pub fn dot(u: Self, v: Self) E {
     return @reduce(.Add, u.vec * v.vec);
 }
@@ -219,6 +223,13 @@ test normed {
     const len = norm.length();
 
     try testing.expectApproxEqAbs(1.0, len, 0.01);
+}
+
+test abs {
+    const vec = Self.init(112, 90, -1);
+    const pos = vec.abs();
+
+    try testing.expectEqualDeep(Self.init(112, 90, 1), pos);
 }
 
 test dot {
