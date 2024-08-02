@@ -3,6 +3,7 @@ const testing = std.testing;
 
 const root = @import("root.zig");
 const Vec3 = root.Vec3;
+const P3 = root.P3;
 const Ray = root.Ray;
 
 const E = root.E;
@@ -11,7 +12,10 @@ center: Vec3,
 radius: E,
 
 pub const Collision = union(enum) {
-    hit: E,
+    hit: struct {
+        t: E,
+        normal: Vec3,
+    },
     inside: E,
     miss,
 };
@@ -36,12 +40,19 @@ pub fn collisionAt(self: Self, ray: Ray) Collision {
         return .{ .miss = {} };
     } else if (first <= 0) {
         return .{ .inside = second };
-    } else return .{ .hit = first };
+    } else return .{ .hit = .{
+        .t = first,
+        .normal = self.normalAt(ray.at(first)),
+    } };
 }
 
 pub fn hitBy(self: Self, ray: Ray) bool {
     _, _, const d = self.abDiscriminant(ray);
     return if (d < 0) false else true;
+}
+
+fn normalAt(self: Self, point: P3) Vec3 {
+    return self.center.to(point).divScalar(self.radius);
 }
 
 fn abDiscriminant(self: Self, ray: Ray) [3]E {
@@ -63,8 +74,12 @@ test collisionAt {
         const dir = Vec3.init(0, 0, -1);
         const ray = Ray.init(origin, dir);
         const coll = sphere.collisionAt(ray);
+        const expected = Collision{ .hit = .{
+            .t = 1.0,
+            .normal = Vec3.init(0, 0, 1),
+        } };
 
-        try testing.expectEqual(Collision{ .hit = 1.0 }, coll);
+        try testing.expectEqual(expected, coll);
     }
     {
         const center = Vec3.init(0, 0, 0);

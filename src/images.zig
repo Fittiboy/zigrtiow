@@ -16,12 +16,8 @@ pub fn rayColor(ray: Ray) Color {
     );
     const collision = sphere.collisionAt(ray);
     switch (collision) {
-        .hit => |t| {
-            const point = ray.at(t);
-            const normal = sphere.center.to(point).normed();
-            // const color_vec = normal.abs();
-            // const color_vec = normal.add(Vec3.init(1, 1, 1)).divScalar(2);
-            const color_vec = normal.add(Vec3.init(1, 1, 1)).normed();
+        .hit => |c| {
+            const color_vec = c.normal.add(Vec3.init(1, 1, 1)).divScalar(2);
             return Color.fromVec3(color_vec);
         },
         else => {
