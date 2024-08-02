@@ -13,7 +13,10 @@ pub const Hittable = union(enum) {
             t: E,
             normal: Vec3,
         },
-        inside: E,
+        inside: struct {
+            t: E,
+            normal: Vec3,
+        },
         miss,
     };
 

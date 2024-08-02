@@ -13,6 +13,7 @@ center: Vec3,
 radius: E,
 
 pub fn init(center: Vec3, radius: E) Self {
+    std.debug.assert(radius >= 0);
     return .{
         .center = center,
         .radius = radius,
@@ -36,10 +37,14 @@ pub fn collisionAt(self: Self, t_min: ?E, t_max: ?E, ray: Ray) Collision {
         return .{ .hit = .{ .t = first, .normal = normal } };
     }
 
-    var second_hit = if (t_min) |t| second >= t else true;
-    if (second_hit) second_hit = if (t_max) |t| second <= t else true;
+    const second_after_min = if (t_min) |t| second >= t else true;
+    const second_before_max = if (t_max) |t| second <= t else true;
+    const second_hit = (second_after_min and second_before_max);
 
-    return if (second_hit) .{ .inside = second } else .{ .miss = {} };
+    if (second_hit) {
+        const normal = self.normalAt(ray.at(first));
+        return .{ .inside = .{ .t = second, .normal = normal } };
+    } else return .{ .miss = {} };
 }
 
 fn normalAt(self: Self, point: P3) Vec3 {
@@ -84,8 +89,12 @@ test collisionAt {
         const dir = Vec3.init(0, 0, -1);
         const ray = Ray.init(origin, dir);
         const coll = sphere.collisionAt(1, 100, ray);
+        const expected = Collision{ .inside = .{
+            .t = 1.0,
+            .normal = Vec3.init(0, 0, 1),
+        } };
 
-        try testing.expectEqual(Collision{ .inside = 1.0 }, coll);
+        try testing.expectEqual(expected, coll);
     }
     {
         const center = Vec3.init(5, 0, -2);
