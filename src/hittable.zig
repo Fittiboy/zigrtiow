@@ -1,8 +1,8 @@
 const root = @import("root.zig");
-const Ray = root.Ray;
-const Sphere = root.Sphere;
 const E = root.E;
 const Vec3 = root.Vec3;
+const Ray = root.Ray;
+const Sphere = root.Sphere;
 
 pub const Hittable = union(enum) {
     const Self = @This();
