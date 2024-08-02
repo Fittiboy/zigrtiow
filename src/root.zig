@@ -13,9 +13,12 @@ pub const Color = @import("color.zig");
 
 pub const Ray = @import("ray.zig");
 
+pub const Sphere = @import("sphere.zig");
+
 test {
     testing.refAllDecls(@import("images.zig"));
     testing.refAllDecls(@import("vector.zig"));
     testing.refAllDecls(@import("color.zig"));
     testing.refAllDecls(@import("ray.zig"));
+    testing.refAllDecls(@import("sphere.zig"));
 }
