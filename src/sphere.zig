@@ -5,20 +5,12 @@ const root = @import("root.zig");
 const Vec3 = root.Vec3;
 const P3 = root.P3;
 const Ray = root.Ray;
+const Collision = root.Collision;
 
 const E = root.E;
 const Self = @This();
 center: Vec3,
 radius: E,
-
-pub const Collision = union(enum) {
-    hit: struct {
-        t: E,
-        normal: Vec3,
-    },
-    inside: E,
-    miss,
-};
 
 pub fn init(center: Vec3, radius: E) Self {
     return .{

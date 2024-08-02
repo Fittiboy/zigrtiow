@@ -13,6 +13,9 @@ pub const Color = @import("color.zig");
 
 pub const Ray = @import("ray.zig");
 
+pub const Hittable = @import("hittable.zig").Hittable;
+pub const Collision = Hittable.Collision;
+
 pub const Sphere = @import("sphere.zig");
 
 test {
@@ -20,5 +23,6 @@ test {
     testing.refAllDecls(@import("vector.zig"));
     testing.refAllDecls(@import("color.zig"));
     testing.refAllDecls(@import("ray.zig"));
+    testing.refAllDecls(@import("hittable.zig"));
     testing.refAllDecls(@import("sphere.zig"));
 }
