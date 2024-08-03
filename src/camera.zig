@@ -104,7 +104,8 @@ pub fn render(self: Self, world: HittableList, writer: anytype) !void {
                 const ray = self.getRay(i, j, rand);
                 color_value = color_value.add(rayColor(ray, world));
             }
-            const color = Color.fromVec3(color_value.mulScalar(self.pixel_sample_scale));
+            const averaged = color_value.mulScalar(self.pixel_sample_scale);
+            const color = Color.fromVec3(averaged);
             try color.writeTo(writer);
             try writer.writeAll(if (i + 1 < self.width) "\t" else "\n");
         }
