@@ -38,7 +38,7 @@ pub fn init(aspect_ratio: ?E, image_width: ?usize, samples_per_pixel: ?usize) Se
     };
     const height_f: f64 = @floatFromInt(height);
 
-    const camera_center = P3.init(.{ 0, 0, 0 });
+    const camera_center = P3.fromArray(.{ 0, 0, 0 });
     const focal_length = 1.0;
 
     // The image's actual aspect ratio might not match chosen aspect ratio,
@@ -47,14 +47,14 @@ pub fn init(aspect_ratio: ?E, image_width: ?usize, samples_per_pixel: ?usize) Se
     const viewport_width: f64 = viewport_height * (width_f / height_f);
 
     // Horizontal (left->right) and vertical (top->bottom) viewport edges
-    const viewport_u = Vec3.init(.{ viewport_width, 0, 0 });
-    const viewport_v = Vec3.init(.{ 0, -viewport_height, 0 });
+    const viewport_u = Vec3.fromArray(.{ viewport_width, 0, 0 });
+    const viewport_v = Vec3.fromArray(.{ 0, -viewport_height, 0 });
 
     const pixel_delta_u = viewport_u.divScalar(width_f);
     const pixel_delta_v = viewport_v.divScalar(height_f);
 
     const viewport_upper_left = camera_center
-        .sub(Vec3.init(.{ 0, 0, focal_length }))
+        .sub(Vec3.fromArray(.{ 0, 0, focal_length }))
         .sub(viewport_u.divScalar(2))
         .sub(viewport_v.divScalar(2));
     const pixel00_loc = viewport_upper_left
@@ -78,8 +78,8 @@ fn rayColor(ray: Ray, world: HittableList) Vec3 {
         return c.normal.addScalar(1).divScalar(2);
     } else {
         const a = 0.5 * (ray.dir.normed().y() + 1.0);
-        const white = Vec3.init(.{ 1.0, 1.0, 1.0 });
-        const blue = Vec3.init(.{ 0.5, 0.7, 1.0 });
+        const white = Vec3.fromArray(.{ 1.0, 1.0, 1.0 });
+        const blue = Vec3.fromArray(.{ 0.5, 0.7, 1.0 });
         return white.lerp(blue, a);
     }
 }
@@ -99,7 +99,7 @@ pub fn render(self: Self, world: HittableList, writer: anytype) !void {
     for (0..self.height) |j| {
         if (self.logging) print("\rScanlines remaining: {d: >5}", .{self.height - j});
         for (0..self.width) |i| {
-            var color_value = Vec3.init(.{ 0, 0, 0 });
+            var color_value = Vec3.fromArray(.{ 0, 0, 0 });
             for (0..self.samples_per_pixel) |_| {
                 const ray = self.getRay(i, j, rand);
                 color_value = color_value.add(rayColor(ray, world));
@@ -121,5 +121,5 @@ fn getRay(self: Self, i: usize, j: usize, rand: std.Random) Ray {
 }
 
 fn sampleSquare(rand: std.Random) Vec3 {
-    return Vec3.init(.{ rand.float(E) - 0.5, rand.float(E) - 0.5, 0 });
+    return Vec3.fromArray(.{ rand.float(E) - 0.5, rand.float(E) - 0.5, 0 });
 }

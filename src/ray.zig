@@ -12,8 +12,8 @@ dir: Vec3,
 
 pub fn init(origin: [3]E, direction: [3]E) Self {
     return .{
-        .orig = P3.init(origin),
-        .dir = Vec3.init(direction),
+        .orig = P3.fromArray(origin),
+        .dir = Vec3.fromArray(direction),
     };
 }
 
@@ -35,7 +35,7 @@ test at {
             .{ 0, 1, 0 },
         );
         const pos = ray.at(1);
-        const expected = Vec3.init(.{ 1, 1, 1 });
+        const expected = Vec3.fromArray(.{ 1, 1, 1 });
 
         try testing.expectEqualDeep(expected, pos);
     }
@@ -46,7 +46,7 @@ test at {
             .{ -1, -1, 0 },
         );
         const pos = ray.at(1);
-        const expected = Vec3.init(.{ 0, -1, 1 });
+        const expected = Vec3.fromArray(.{ 0, -1, 1 });
 
         try testing.expectEqualDeep(expected, pos);
     }

@@ -16,7 +16,7 @@ radius: E,
 pub fn init(center: [3]E, radius: E) Self {
     std.debug.assert(radius >= 0);
     return .{
-        .center = Vec3.init(center),
+        .center = Vec3.fromArray(center),
         .radius = radius,
     };
 }
@@ -68,8 +68,8 @@ test collisionAt {
         const coll = sphere.collisionAt(Interval.init(0, 100), ray);
         const expected = Collision{
             .t = 1.0,
-            .p = P3.init(.{ 0, 0, -1 }),
-            .normal = Vec3.init(.{ 0, 0, 1 }),
+            .p = P3.fromArray(.{ 0, 0, -1 }),
+            .normal = Vec3.fromArray(.{ 0, 0, 1 }),
             .face = .front,
         };
 
@@ -81,8 +81,8 @@ test collisionAt {
         const coll = sphere.collisionAt(Interval.init(0, 100), ray);
         const expected = Collision{
             .t = 1.0,
-            .p = P3.init(.{ 0, 0, -1 }),
-            .normal = Vec3.init(.{ 0, 0, 1 }),
+            .p = P3.fromArray(.{ 0, 0, -1 }),
+            .normal = Vec3.fromArray(.{ 0, 0, 1 }),
             .face = .back,
         };
 

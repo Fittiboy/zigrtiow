@@ -35,7 +35,7 @@ pub const Hittable = union(enum) {
         const sphere = Self.initSphere(.{ 0, 0, 0 }, 1);
 
         try testing.expectEqualDeep(Self{ .sphere = Sphere{
-            .center = Vec3.init(.{ 0, 0, 0 }),
+            .center = Vec3.fromArray(.{ 0, 0, 0 }),
             .radius = 1,
         } }, sphere);
     }
