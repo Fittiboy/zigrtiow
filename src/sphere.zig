@@ -63,12 +63,12 @@ fn abDiscriminant(self: Self, ray: Ray) [3]E {
 
 test collisionAt {
     {
-        const center = Vec3.init(0, 0, -2);
+        const center = P3.init(0, 0, -2);
         const sphere = Self.init(center, 1);
-        const origin = Vec3.init(0, 0, 0);
+        const origin = P3.init(0, 0, 0);
         const dir = Vec3.init(0, 0, -1);
         const ray = Ray.init(origin, dir);
-        const coll = sphere.collisionAt(Interval.init(1, 100), ray);
+        const coll = sphere.collisionAt(Interval.init(0, 100), ray);
         const expected = Collision{
             .t = 1.0,
             .p = P3.init(0, 0, -1),
@@ -79,12 +79,12 @@ test collisionAt {
         try testing.expectEqual(expected, coll);
     }
     {
-        const center = Vec3.init(0, 0, 0);
+        const center = P3.init(0, 0, 0);
         const sphere = Self.init(center, 1);
-        const origin = Vec3.init(0, 0, 0);
+        const origin = P3.init(0, 0, 0);
         const dir = Vec3.init(0, 0, -1);
         const ray = Ray.init(origin, dir);
-        const coll = sphere.collisionAt(Interval.init(1, 100), ray);
+        const coll = sphere.collisionAt(Interval.init(0, 100), ray);
         const expected = Collision{
             .t = 1.0,
             .p = P3.init(0, 0, -1),
@@ -95,12 +95,12 @@ test collisionAt {
         try testing.expectEqual(expected, coll);
     }
     {
-        const center = Vec3.init(5, 0, -2);
+        const center = P3.init(5, 0, -2);
         const sphere = Self.init(center, 1);
-        const origin = Vec3.init(0, 0, 0);
+        const origin = P3.init(0, 0, 0);
         const dir = Vec3.init(0, 0, -1);
         const ray = Ray.init(origin, dir);
-        const coll = sphere.collisionAt(Interval.init(1, 100), ray);
+        const coll = sphere.collisionAt(Interval.init(0, 100), ray);
 
         try testing.expectEqual(null, coll);
     }
