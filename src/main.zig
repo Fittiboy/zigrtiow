@@ -18,7 +18,7 @@ pub fn main() !void {
     const width = 400;
     const aspect = 16.0 / 9.0;
     const camera = blk: {
-        var camera = Camera.init(aspect, width, 10);
+        var camera = Camera.init(aspect, width, 100);
         camera.logging = true;
         break :blk camera;
     };

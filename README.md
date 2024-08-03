@@ -61,3 +61,16 @@ Before I did that, I actually made two red spheres using my simple light
 source.  
 
 ![A small and a large sphere, softly lit from above](samples/pngs/two_shaded_red_spheres.png)  
+
+## 8. Antialiasing
+Chapter 7 was about doing some refactoring which didn't apply to my
+implementation, as the camera was already in its own file, just under a
+different name.  
+In chapter 8, however, I added something cool: Antialiasing! Through
+random sampling of a small square around each target pixel, and
+subsequent averaging of the sampled values, a less jagged edge is
+produced, which looks a lot nicer.  
+Look at the direct comparison!  
+
+![A small sphere hovering over a large sphere](samples/pngs/multiple_spheres.png)
+![A small sphere hovering over a large sphere, after antialiasing](samples/pngs/first_aa.png)  
