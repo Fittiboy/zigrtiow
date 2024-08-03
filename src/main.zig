@@ -1,15 +1,36 @@
 const std = @import("std");
-const Camera = @import("root.zig").Camera;
+const root = @import("root.zig");
+const Vec3 = root.Vec3;
+const Camera = root.Camera;
+const Hittable = root.Hittable;
+const HittableList = root.HittableList;
 const testing = std.testing;
 
 pub fn main() !void {
     var gpa = std.heap.GeneralPurposeAllocator(.{}){};
     const allocator = gpa.allocator();
+
+    var world = try HittableList.init(allocator);
+    defer world.deinit();
+    try world.add(Hittable.initSphere(
+        Vec3.init(0, 0, -1),
+        0.5,
+    ));
+    try world.add(Hittable.initSphere(
+        Vec3.init(0, -100.5, -1),
+        100,
+    ));
+
     const width = 400;
     const aspect = 16.0 / 9.0;
+    const camera = blk: {
+        var camera = Camera.init(aspect, width);
+        camera.logging = true;
+        break :blk camera;
+    };
 
     var stdout = std.io.getStdOut();
     var buffered = std.io.bufferedWriter(stdout.writer());
-    try Camera.render(allocator, buffered.writer(), width, aspect, true);
+    try camera.render(world, buffered.writer(), true);
     try buffered.flush();
 }

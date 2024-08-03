@@ -47,7 +47,7 @@ test add {
     defer list.deinit();
     try testing.expectEqual(0, list.objects.items.len);
     try list.add(Hittable.initSphere(
-        root.Vec3.init(0, 0, 0),
+        .{ 0, 0, 0 },
         1,
     ));
 
@@ -59,7 +59,7 @@ test clear {
     var objects = std.ArrayList(Hittable).init(alloc);
     defer objects.deinit();
     try objects.append(Hittable.initSphere(
-        root.Vec3.init(0, 0, 0),
+        .{ 0, 0, 0 },
         1,
     ));
     var list = Self{ .objects = objects };

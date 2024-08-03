@@ -13,7 +13,7 @@ pub const Hittable = union(enum) {
     const Self = @This();
     sphere: Sphere,
 
-    pub fn initSphere(center: Vec3, radius: E) Self {
+    pub fn initSphere(center: [3]E, radius: E) Self {
         return .{ .sphere = Sphere.init(center, radius) };
     }
 
@@ -32,10 +32,10 @@ pub const Hittable = union(enum) {
     }
 
     test initSphere {
-        const sphere = Self.initSphere(Vec3.init(0, 0, 0), 1);
+        const sphere = Self.initSphere(.{ 0, 0, 0 }, 1);
 
         try testing.expectEqualDeep(Self{ .sphere = Sphere{
-            .center = Vec3.init(0, 0, 0),
+            .center = Vec3.init(.{ 0, 0, 0 }),
             .radius = 1,
         } }, sphere);
     }

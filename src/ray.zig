@@ -10,10 +10,10 @@ const E = root.E;
 orig: P3,
 dir: Vec3,
 
-pub fn init(origin: P3, direction: Vec3) Self {
+pub fn init(origin: [3]E, direction: [3]E) Self {
     return .{
-        .orig = origin,
-        .dir = direction,
+        .orig = P3.init(origin),
+        .dir = Vec3.init(direction),
     };
 }
 
@@ -24,22 +24,22 @@ pub fn at(self: Self, t: E) P3 {
 test at {
     {
         const ray = Self.init(
-            .{ .vec = .{ 1, 0, 1 } },
-            .{ .vec = .{ 0, 1, 0 } },
+            .{ 1, 0, 1 },
+            .{ 0, 1, 0 },
         );
         const pos = ray.at(1);
-        const expected = Vec3.init(1, 1, 1);
+        const expected = Vec3.init(.{ 1, 1, 1 });
 
         try testing.expectEqualDeep(expected, pos);
     }
 
     {
         const ray = Self.init(
-            .{ .vec = .{ 1, 0, 1 } },
-            .{ .vec = .{ -1, -1, 0 } },
+            .{ 1, 0, 1 },
+            .{ -1, -1, 0 },
         );
         const pos = ray.at(1);
-        const expected = Vec3.init(0, -1, 1);
+        const expected = Vec3.init(.{ 0, -1, 1 });
 
         try testing.expectEqualDeep(expected, pos);
     }
