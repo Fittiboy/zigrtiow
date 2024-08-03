@@ -12,14 +12,8 @@ pub fn main() !void {
 
     var world = try HittableList.init(allocator);
     defer world.deinit();
-    try world.add(Hittable.initSphere(
-        Vec3.init(0, 0, -1),
-        0.5,
-    ));
-    try world.add(Hittable.initSphere(
-        Vec3.init(0, -100.5, -1),
-        100,
-    ));
+    try world.add(Hittable.initSphere(.{ 0, 0, -1 }, 0.5));
+    try world.add(Hittable.initSphere(.{ 0, -100.5, -1 }, 100));
 
     const width = 400;
     const aspect = 16.0 / 9.0;
@@ -31,6 +25,6 @@ pub fn main() !void {
 
     var stdout = std.io.getStdOut();
     var buffered = std.io.bufferedWriter(stdout.writer());
-    try camera.render(world, buffered.writer(), true);
+    try camera.render(world, buffered.writer());
     try buffered.flush();
 }

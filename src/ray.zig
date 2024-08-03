@@ -17,6 +17,13 @@ pub fn init(origin: [3]E, direction: [3]E) Self {
     };
 }
 
+pub fn fromVecs(origin: P3, direction: Vec3) Self {
+    return .{
+        .orig = origin,
+        .dir = direction,
+    };
+}
+
 pub fn at(self: Self, t: E) P3 {
     return self.orig.add(self.dir.mulScalar(t));
 }

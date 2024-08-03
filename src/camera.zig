@@ -86,18 +86,18 @@ pub fn render(self: Self, world: HittableList, writer: anytype) !void {
     try writer.print("P3\n{d} {d}\n{d}\n", .{ self.width, self.height, max_color });
 
     for (0..self.height) |j| {
-        if (self.log) print("\rScanlines remaining: {d: >5}", .{self.height - j});
+        if (self.logging) print("\rScanlines remaining: {d: >5}", .{self.height - j});
         for (0..self.width) |i| {
             const pixel_center = self.pixel00_loc
                 .add(self.pixel_delta_u.mulScalar(@floatFromInt(i)))
                 .add(self.pixel_delta_v.mulScalar(@floatFromInt(j)));
             const ray_direction = self.center.to(pixel_center);
-            const ray = Ray.init(self.center, ray_direction);
+            const ray = Ray.fromVecs(self.center, ray_direction);
             const color = rayColor(ray, world);
 
             try color.writeTo(writer);
             try writer.writeAll(if (i + 1 < self.width) "\t" else "\n");
         }
     }
-    if (self.log) print("\r{s: <26}\n", .{"Done!"});
+    if (self.logging) print("\r{s: <26}\n", .{"Done!"});
 }
