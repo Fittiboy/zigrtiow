@@ -17,6 +17,8 @@ const Interval = root.Interval;
 const Self = @This();
 aspect_ratio: E = 1.0,
 width: usize = 100,
+samples_per_pixel: usize = 10,
+pixel_sample_scale: E,
 height: usize,
 center: P3,
 pixel00_loc: P3,
@@ -24,9 +26,10 @@ pixel_delta_u: Vec3,
 pixel_delta_v: Vec3,
 logging: bool = false,
 
-pub fn init(aspect_ratio: ?E, image_width: ?usize) Self {
+pub fn init(aspect_ratio: ?E, image_width: ?usize, samples_per_pixel: ?usize) Self {
     const ratio = aspect_ratio orelse 1.0;
     const width = image_width orelse 100;
+    const samples = samples_per_pixel orelse 10;
 
     const width_f: f64 = @floatFromInt(width);
     const height: usize = blk: {
@@ -60,6 +63,8 @@ pub fn init(aspect_ratio: ?E, image_width: ?usize) Self {
     return Self{
         .aspect_ratio = ratio,
         .width = width,
+        .samples_per_pixel = samples,
+        .pixel_sample_scale = 1.0 / @as(E, @floatFromInt(samples)),
         .height = height,
         .center = camera_center,
         .pixel00_loc = pixel00_loc,
@@ -68,18 +73,24 @@ pub fn init(aspect_ratio: ?E, image_width: ?usize) Self {
     };
 }
 
-fn rayColor(ray: Ray, world: HittableList) Color {
+fn rayColor(ray: Ray, world: HittableList) Vec3 {
     if (world.hit(Interval.init(0, root.inf), ray)) |c| {
-        return Color.fromVec3(c.normal.addScalar(1).divScalar(2));
+        return c.normal.addScalar(1).divScalar(2);
     } else {
         const a = 0.5 * (ray.dir.normed().y() + 1.0);
         const white = Vec3.init(.{ 1.0, 1.0, 1.0 });
         const blue = Vec3.init(.{ 0.5, 0.7, 1.0 });
-        return Color.fromVec3(white.lerp(blue, a));
+        return white.lerp(blue, a);
     }
 }
 
 pub fn render(self: Self, world: HittableList, writer: anytype) !void {
+    var prng = std.Random.DefaultPrng.init(blk: {
+        var seed: usize = undefined;
+        try std.posix.getrandom(std.mem.asBytes(&seed));
+        break :blk seed;
+    });
+    const rand = prng.random();
     // We render the image in the
     // [PPM](https://en.wikipedia.org/wiki/Netpbm#PPM_example) format.
     const max_color = 255;
@@ -88,16 +99,27 @@ pub fn render(self: Self, world: HittableList, writer: anytype) !void {
     for (0..self.height) |j| {
         if (self.logging) print("\rScanlines remaining: {d: >5}", .{self.height - j});
         for (0..self.width) |i| {
-            const pixel_center = self.pixel00_loc
-                .add(self.pixel_delta_u.mulScalar(@floatFromInt(i)))
-                .add(self.pixel_delta_v.mulScalar(@floatFromInt(j)));
-            const ray_direction = self.center.to(pixel_center);
-            const ray = Ray.fromVecs(self.center, ray_direction);
-            const color = rayColor(ray, world);
-
+            var color_value = Vec3.init(.{ 0, 0, 0 });
+            for (0..self.samples_per_pixel) |_| {
+                const ray = self.getRay(i, j, rand);
+                color_value = color_value.add(rayColor(ray, world));
+            }
+            const color = Color.fromVec3(color_value.mulScalar(self.pixel_sample_scale));
             try color.writeTo(writer);
             try writer.writeAll(if (i + 1 < self.width) "\t" else "\n");
         }
     }
     if (self.logging) print("\r{s: <26}\n", .{"Done!"});
+}
+
+fn getRay(self: Self, i: usize, j: usize, rand: std.Random) Ray {
+    const offset = sampleSquare(rand);
+    const sample = self.pixel00_loc
+        .add(self.pixel_delta_u.mulScalar(@as(E, @floatFromInt(i)) + offset.x()))
+        .add(self.pixel_delta_v.mulScalar(@as(E, @floatFromInt(j)) + offset.y()));
+    return Ray.fromVecs(self.center, self.center.to(sample));
+}
+
+fn sampleSquare(rand: std.Random) Vec3 {
+    return Vec3.init(.{ rand.float(E) - 0.5, rand.float(E) - 0.5, 0 });
 }
