@@ -1,5 +1,5 @@
 const std = @import("std");
-const rt = @import("root.zig");
+const Camera = @import("root.zig").Camera;
 const testing = std.testing;
 
 pub fn main() !void {
@@ -10,6 +10,6 @@ pub fn main() !void {
 
     var stdout = std.io.getStdOut();
     var buffered = std.io.bufferedWriter(stdout.writer());
-    try rt.Images.imagePPM(allocator, buffered.writer(), width, aspect, true);
+    try Camera.render(allocator, buffered.writer(), width, aspect, true);
     try buffered.flush();
 }

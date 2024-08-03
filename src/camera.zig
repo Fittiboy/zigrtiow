@@ -13,7 +13,7 @@ const HittableList = root.HittableList;
 const Sphere = root.Sphere;
 const Interval = root.Interval;
 
-pub fn rayColor(ray: Ray, world: HittableList) Color {
+fn rayColor(ray: Ray, world: HittableList) Color {
     // const light_source = Vec3.init(10, 10, -0.5);
     if (world.hit(Interval.init(0, root.inf), ray)) |c| {
         // const light_dir = c.p.directionTo(light_source);
@@ -30,7 +30,7 @@ pub fn rayColor(ray: Ray, world: HittableList) Color {
     }
 }
 
-pub fn imagePPM(
+pub fn render(
     allocator: Allocator,
     writer: anytype,
     width: usize,
