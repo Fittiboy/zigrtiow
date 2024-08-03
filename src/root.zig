@@ -25,7 +25,7 @@ pub const Interval = @import("interval.zig");
 pub const inf: E = std.math.inf(E);
 pub const pi: E = std.math.pi;
 
-pub fn degToRad(degrees: E) E {
+pub inline fn degToRad(degrees: E) E {
     return degrees * pi / 180.0;
 }
 
