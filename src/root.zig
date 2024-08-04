@@ -24,6 +24,8 @@ pub const Interval = @import("interval.zig");
 
 pub const RefCounter = @import("ref_counted.zig");
 
+pub const Material = @import("material.zig").Material;
+
 pub const inf: E = std.math.inf(E);
 pub const pi: E = std.math.pi;
 
@@ -54,4 +56,5 @@ test {
     testing.refAllDecls(@import("sphere.zig"));
     testing.refAllDecls(@import("interval.zig"));
     testing.refAllDecls(@import("ref_counted.zig"));
+    testing.refAllDecls(@import("material.zig"));
 }
