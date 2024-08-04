@@ -74,3 +74,10 @@ Look at the direct comparison!
 
 ![A small sphere hovering over a large sphere](samples/pngs/multiple_spheres.png)
 ![A small sphere hovering over a large sphere, after antialiasing](samples/pngs/first_aa.png)  
+
+## 9. Diffuse Materials
+At the beginning of this chapter, a couple of randomization methods are
+implemented, which are then used to enable diffuse materials.  
+Here is a first example, using the two spheres from before.  
+
+![Two gray spheres](samples/pngs/first_diffuse.png)  
