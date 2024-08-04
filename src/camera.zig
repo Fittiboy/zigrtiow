@@ -18,6 +18,7 @@ const Self = @This();
 aspect_ratio: E = 1.0,
 width: usize = 100,
 samples_per_pixel: usize = 10,
+max_depth: usize = 10,
 pixel_sample_scale: E,
 height: usize,
 center: P3,
@@ -26,10 +27,16 @@ pixel_delta_u: Vec3,
 pixel_delta_v: Vec3,
 logging: bool = false,
 
-pub fn init(aspect_ratio: ?E, image_width: ?usize, samples_per_pixel: ?usize) Self {
+pub fn init(
+    aspect_ratio: ?E,
+    image_width: ?usize,
+    samples_per_pixel: ?usize,
+    bounce_depth: ?usize,
+) Self {
     const ratio = aspect_ratio orelse 1.0;
     const width = image_width orelse 100;
     const samples = samples_per_pixel orelse 10;
+    const max_depth = bounce_depth orelse 10;
 
     const width_f: f64 = @floatFromInt(width);
     const height: usize = blk: {
@@ -65,6 +72,7 @@ pub fn init(aspect_ratio: ?E, image_width: ?usize, samples_per_pixel: ?usize) Se
         .width = width,
         .samples_per_pixel = samples,
         .pixel_sample_scale = 1.0 / @as(E, @floatFromInt(samples)),
+        .max_depth = max_depth,
         .height = height,
         .center = camera_center,
         .pixel00_loc = pixel00_loc,
@@ -73,10 +81,11 @@ pub fn init(aspect_ratio: ?E, image_width: ?usize, samples_per_pixel: ?usize) Se
     };
 }
 
-fn rayColor(rand: std.Random, ray: Ray, world: HittableList) Vec3 {
+fn rayColor(rand: std.Random, ray: Ray, world: HittableList, depth: usize) Vec3 {
+    if (depth == 0) return Vec3.init(0, 0, 0);
     if (world.hit(Interval.init(0, root.inf), ray)) |c| {
         const direction = Vec3.randomOnHemisphere(rand, c.normal);
-        return rayColor(rand, Ray.fromVecs(c.p, direction), world).divScalar(2);
+        return rayColor(rand, Ray.fromVecs(c.p, direction), world, depth - 1).divScalar(2);
     } else {
         const a = 0.5 * (ray.dir.normed().y() + 1.0);
         const white = Vec3.fromArray(.{ 1.0, 1.0, 1.0 });
@@ -99,7 +108,7 @@ pub fn render(self: Self, world: HittableList, writer: anytype) !void {
             var color_value = Vec3.fromArray(.{ 0, 0, 0 });
             for (0..self.samples_per_pixel) |_| {
                 const ray = self.getRay(i, j, rand);
-                color_value = color_value.add(rayColor(rand, ray, world));
+                color_value = color_value.add(rayColor(rand, ray, world, self.max_depth));
             }
             const averaged = color_value.mulScalar(self.pixel_sample_scale);
             const color = Color.fromVec3(averaged);
