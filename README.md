@@ -81,3 +81,15 @@ implemented, which are then used to enable diffuse materials.
 Here is a first example, using the two spheres from before.  
 
 ![Two gray spheres](samples/pngs/first_diffuse.png)  
+
+It turns out the image is a lot darker than it should be, due to a
+phenomenon called "shadow acne."  
+The point at which a ray intersects a sphere is never return perfectly,
+due to floating point errors. If the returned value is ever so slightly
+below the sphere's surface, casting another ray from that point will lead
+to another intersection immediately.  
+This problem is solved by simply ignoring any collisions for some very
+small values of `t`.  
+Here is the result of that fix.  
+
+![Two gray sphere, lighter and smoother than before](samples/pngs/fix_acne.png)  

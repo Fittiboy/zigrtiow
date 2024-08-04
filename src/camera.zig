@@ -83,7 +83,7 @@ pub fn init(
 
 fn rayColor(rand: std.Random, ray: Ray, world: HittableList, depth: usize) Vec3 {
     if (depth == 0) return Vec3.init(0, 0, 0);
-    if (world.hit(Interval.init(0, root.inf), ray)) |c| {
+    if (world.hit(Interval.init(0.001, root.inf), ray)) |c| {
         const direction = Vec3.randomOnHemisphere(rand, c.normal);
         return rayColor(rand, Ray.fromVecs(c.p, direction), world, depth - 1).divScalar(2);
     } else {
