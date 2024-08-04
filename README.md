@@ -104,3 +104,8 @@ Setting the reflectance to 10%, 30%, 50%, 70%, and finally 90% shows the
 gamut of the renderer.  
 
 ![Five versions of the spheres overlaid, at different brightness levels](samples/pngs/original_gamut.png)  
+
+Here is the gamut after applying gamma correction, showing the brightness
+more correctly.  
+
+![Gamma corrected image of the spheres at different brightness levels](samples/pngs/corrected_gamut.png)  
