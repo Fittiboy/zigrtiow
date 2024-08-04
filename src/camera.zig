@@ -73,9 +73,10 @@ pub fn init(aspect_ratio: ?E, image_width: ?usize, samples_per_pixel: ?usize) Se
     };
 }
 
-fn rayColor(ray: Ray, world: HittableList) Vec3 {
+fn rayColor(rand: std.Random, ray: Ray, world: HittableList) Vec3 {
     if (world.hit(Interval.init(0, root.inf), ray)) |c| {
-        return c.normal.addScalar(1).divScalar(2);
+        const direction = Vec3.randomOnHemisphere(rand, c.normal);
+        return rayColor(rand, Ray.fromVecs(c.p, direction), world).divScalar(2);
     } else {
         const a = 0.5 * (ray.dir.normed().y() + 1.0);
         const white = Vec3.fromArray(.{ 1.0, 1.0, 1.0 });
@@ -98,7 +99,7 @@ pub fn render(self: Self, world: HittableList, writer: anytype) !void {
             var color_value = Vec3.fromArray(.{ 0, 0, 0 });
             for (0..self.samples_per_pixel) |_| {
                 const ray = self.getRay(i, j, rand);
-                color_value = color_value.add(rayColor(ray, world));
+                color_value = color_value.add(rayColor(rand, ray, world));
             }
             const averaged = color_value.mulScalar(self.pixel_sample_scale);
             const color = Color.fromVec3(averaged);

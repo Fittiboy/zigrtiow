@@ -39,6 +39,15 @@ pub fn randomInUnitSphere(rand: std.Random) Self {
     }
 }
 
+pub fn randomUnit(rand: std.Random) Self {
+    return Self.randomInUnitSphere(rand).normed();
+}
+
+pub fn randomOnHemisphere(rand: std.Random, normal: Self) Self {
+    const vec = Self.randomUnit(rand);
+    if (vec.dot(normal) > 0) return vec else return vec.flipped();
+}
+
 pub inline fn x(self: Self) E {
     return self.vec[0];
 }
@@ -97,6 +106,10 @@ pub fn normed(self: Self) Self {
 
 pub fn abs(self: Self) Self {
     return Self{ .vec = @abs(self.vec) };
+}
+
+pub fn flipped(self: Self) Self {
+    return self.mulScalar(-1);
 }
 
 pub fn positive(self: Self) Self {
@@ -174,6 +187,26 @@ test randomInUnitSphere {
         const vec = Self.randomInUnitSphere(rand);
 
         try testing.expect(vec.lengthSquared() < 1);
+    }
+}
+
+test randomUnit {
+    var prng = try root.rng();
+    const rand = prng.random();
+    const vec = Self.randomUnit(rand);
+
+    try testing.expectApproxEqAbs(1, vec.lengthSquared(), 0.001);
+}
+
+test randomOnHemisphere {
+    var prng = try root.rng();
+    const rand = prng.random();
+    const normal = Self.init(0, 0, -1);
+
+    for (0..1000) |_| {
+        const vec = randomOnHemisphere(rand, normal);
+
+        try testing.expect(vec.z() < 0);
     }
 }
 
@@ -307,6 +340,13 @@ test abs {
     const pos = vec.abs();
 
     try testing.expectEqualDeep(Self.fromArray(.{ 112, 90, 1 }), pos);
+}
+
+test flipped {
+    const vec = Self.init(1, 2, -3);
+    const expected = Self.init(-1, -2, 3);
+
+    try testing.expectEqualDeep(expected, vec.flipped());
 }
 
 test positive {
