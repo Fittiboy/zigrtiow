@@ -13,6 +13,7 @@ const Hittable = root.Hittable;
 const HittableList = root.HittableList;
 const Sphere = root.Sphere;
 const Interval = root.Interval;
+const Material = root.Material;
 
 const Self = @This();
 aspect_ratio: E = 1.0,
@@ -81,17 +82,20 @@ pub fn init(
     };
 }
 
-fn rayColor(rand: std.Random, ray: Ray, world: HittableList, depth: usize) Vec3 {
+fn rayColorValue(rand: std.Random, ray: Ray, world: HittableList, depth: usize) Vec3 {
     if (depth == 0) return Vec3.init(0, 0, 0);
+
     if (world.hit(Interval.init(0.001, root.inf), ray)) |c| {
-        const direction = c.normal.add(Vec3.randomUnit(rand));
-        return rayColor(rand, Ray.fromVecs(c.p, direction), world, depth - 1).mulScalar(0.5);
-    } else {
-        const a = 0.5 * (ray.dir.normed().y() + 1.0);
-        const white = Vec3.fromArray(.{ 1.0, 1.0, 1.0 });
-        const blue = Vec3.fromArray(.{ 0.5, 0.7, 1.0 });
-        return white.lerp(blue, a);
+        if (c.matRef().scatter(rand, ray, c)) |s| {
+            return rayColorValue(rand, s.ray, world, depth - 1).mul(s.attenuation);
+        }
+        return Vec3.init(0, 0, 0);
     }
+
+    const a = 0.5 * (ray.dir.normed().y() + 1.0);
+    const white = Vec3.fromArray(.{ 1.0, 1.0, 1.0 });
+    const blue = Vec3.fromArray(.{ 0.5, 0.7, 1.0 });
+    return white.lerp(blue, a);
 }
 
 pub fn render(self: Self, world: HittableList, writer: anytype) !void {
@@ -108,7 +112,7 @@ pub fn render(self: Self, world: HittableList, writer: anytype) !void {
             var color_value = Vec3.fromArray(.{ 0, 0, 0 });
             for (0..self.samples_per_pixel) |_| {
                 const ray = self.getRay(i, j, rand);
-                color_value = color_value.add(rayColor(rand, ray, world, self.max_depth));
+                color_value = color_value.add(rayColorValue(rand, ray, world, self.max_depth));
             }
             const averaged = color_value.mulScalar(self.pixel_sample_scale);
             const color = Color.fromVec3(averaged);

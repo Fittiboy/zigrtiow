@@ -22,9 +22,10 @@ pub const Sphere = @import("sphere.zig");
 
 pub const Interval = @import("interval.zig");
 
-pub const RefCounter = @import("ref_counted.zig");
+pub const RefCounted = @import("ref_counted.zig").RefCounted;
 
 pub const Material = @import("material.zig").Material;
+pub const ScatteredRay = @import("material.zig").ScatteredRay;
 
 pub const inf: E = std.math.inf(E);
 pub const pi: E = std.math.pi;

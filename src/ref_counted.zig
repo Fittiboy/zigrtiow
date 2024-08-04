@@ -2,7 +2,7 @@ const std = @import("std");
 const testing = std.testing;
 const Allocator = std.mem.Allocator;
 
-fn RefCounted(comptime T: type) type {
+pub fn RefCounted(comptime T: type) type {
     return struct {
         const Self = @This();
 
@@ -22,6 +22,28 @@ fn RefCounted(comptime T: type) type {
                 .allocator = allocator,
             };
             return Self{ .data = data };
+        }
+
+        pub fn alloc(comptime len: usize, allocator: Allocator) ![len]Self {
+            comptime std.debug.assert(len > 0);
+            var arr = try allocator.alloc(Data, len);
+            for (0..len) |i| {
+                const data = try allocator.create(Data);
+                data.* = Data{
+                    .value = undefined,
+                    .ref_count = 1,
+                    .allocator = allocator,
+                };
+                arr[i] = Self{ .data = data };
+            }
+            return arr;
+        }
+
+        pub fn free(slice: []Self, allocator: Allocator) void {
+            for (slice) |data| {
+                data.deinit();
+            }
+            allocator.free(slice);
         }
 
         pub fn deinit(self: Self) void {

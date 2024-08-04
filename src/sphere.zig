@@ -7,18 +7,27 @@ const P3 = root.P3;
 const Ray = root.Ray;
 const Collision = root.Collision;
 const Interval = root.Interval;
+const RefCounted = root.RefCounted;
+const Material = root.Material;
 
 const E = root.E;
 const Self = @This();
 center: Vec3,
 radius: E,
+mat: RefCounted(Material),
 
-pub fn init(center: [3]E, radius: E) Self {
+pub fn init(center: [3]E, radius: E, mat: RefCounted(Material)) Self {
     std.debug.assert(radius >= 0);
+    const mat_ref = mat.strongRef();
     return .{
         .center = Vec3.fromArray(center),
         .radius = radius,
+        .mat = mat_ref,
     };
+}
+
+pub fn deinit(self: Self) void {
+    self.mat.deinit();
 }
 
 pub fn collisionAt(self: Self, interval: Interval, ray: Ray) ?Collision {
@@ -38,7 +47,13 @@ pub fn collisionAt(self: Self, interval: Interval, ray: Ray) ?Collision {
     var normal = self.normalAt(ray.at(t));
     if (t == second) normal = normal.mulScalar(-1);
 
-    return Collision{ .t = t, .p = ray.at(t), .normal = normal, .face = face };
+    return Collision{
+        .t = t,
+        .p = ray.at(t),
+        .normal = normal,
+        .mat = self.mat,
+        .face = face,
+    };
 }
 
 fn normalAt(self: Self, point: P3) Vec3 {
@@ -63,33 +78,44 @@ fn abDiscriminant(self: Self, ray: Ray) [3]E {
 
 test collisionAt {
     {
-        const sphere = Self.init(.{ 0, 0, -2 }, 1);
+        const mat = try RefCounted(Material).create(testing.allocator);
+        defer mat.deinit();
+        const sphere = Self.init(.{ 0, 0, -2 }, 1, mat);
+        defer sphere.deinit();
         const ray = Ray.init(.{ 0, 0, 0 }, .{ 0, 0, -1 });
         const coll = sphere.collisionAt(Interval.init(0, 100), ray);
         const expected = Collision{
             .t = 1.0,
             .p = P3.fromArray(.{ 0, 0, -1 }),
             .normal = Vec3.fromArray(.{ 0, 0, 1 }),
+            .mat = mat,
             .face = .front,
         };
 
         try testing.expectEqual(expected, coll);
     }
     {
-        const sphere = Self.init(.{ 0, 0, 0 }, 1);
+        const mat = try RefCounted(Material).create(testing.allocator);
+        defer mat.deinit();
+        const sphere = Self.init(.{ 0, 0, 0 }, 1, mat);
+        defer sphere.deinit();
         const ray = Ray.init(.{ 0, 0, 0 }, .{ 0, 0, -1 });
         const coll = sphere.collisionAt(Interval.init(0, 100), ray);
         const expected = Collision{
             .t = 1.0,
             .p = P3.fromArray(.{ 0, 0, -1 }),
             .normal = Vec3.fromArray(.{ 0, 0, 1 }),
+            .mat = mat,
             .face = .back,
         };
 
         try testing.expectEqual(expected, coll);
     }
     {
-        const sphere = Self.init(.{ 5, 0, -2 }, 1);
+        const mat = try RefCounted(Material).create(testing.allocator);
+        defer mat.deinit();
+        const sphere = Self.init(.{ 5, 0, -2 }, 1, mat);
+        defer sphere.deinit();
         const ray = Ray.init(.{ 0, 0, 0 }, .{ 0, 0, -1 });
         const coll = sphere.collisionAt(Interval.init(0, 100), ray);
 
@@ -98,7 +124,10 @@ test collisionAt {
 }
 
 test abDiscriminant {
-    const sphere = Self.init(.{ 0, 0, -2 }, 1);
+    const mat = try RefCounted(Material).create(testing.allocator);
+    defer mat.deinit();
+    const sphere = Self.init(.{ 0, 0, -2 }, 1, mat);
+    defer sphere.deinit();
     const ray = Ray.init(.{ 0, 0, 0 }, .{ 0, 0, -1 });
     const a, const b, const d = sphere.abDiscriminant(ray);
 

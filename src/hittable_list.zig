@@ -8,6 +8,8 @@ const Ray = root.Ray;
 const Hittable = root.Hittable;
 const Collision = root.Collision;
 const Interval = root.Interval;
+const RefCounted = root.RefCounted;
+const Material = root.Material;
 
 const Self = @This();
 objects: std.ArrayList(Hittable),
@@ -43,13 +45,21 @@ pub fn hit(self: Self, interval: Interval, ray: Ray) ?Collision {
 }
 
 test add {
+    const mat = try RefCounted(Material).create(testing.allocator);
+    defer mat.deinit();
+    mat.data.value = Material.default();
     var list = try Self.init(testing.allocator);
     defer list.deinit();
+
     try testing.expectEqual(0, list.objects.items.len);
-    try list.add(Hittable.initSphere(
+
+    const sphere = Hittable.initSphere(
         .{ 0, 0, 0 },
         1,
-    ));
+        mat,
+    );
+    defer sphere.deinit();
+    try list.add(sphere);
 
     try testing.expectEqual(1, list.objects.items.len);
 }
@@ -58,10 +68,18 @@ test clear {
     const alloc = std.testing.allocator;
     var objects = std.ArrayList(Hittable).init(alloc);
     defer objects.deinit();
-    try objects.append(Hittable.initSphere(
+
+    const mat = try RefCounted(Material).create(alloc);
+    defer mat.deinit();
+    mat.data.value = Material.default();
+    const sphere = Hittable.initSphere(
         .{ 0, 0, 0 },
         1,
-    ));
+        mat,
+    );
+    defer sphere.deinit();
+    try objects.append(sphere);
+
     var list = Self{ .objects = objects };
     try list.clear();
 

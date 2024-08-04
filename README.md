@@ -109,3 +109,10 @@ Here is the gamut after applying gamma correction, showing the brightness
 more correctly.  
 
 ![Gamma corrected image of the spheres at different brightness levels](samples/pngs/corrected_gamut.png)  
+
+## 10. Metal
+After lots of refactoring, there are now different materials.  
+In addition to the original lambertian diffuse reflector, there is now
+also metal!  
+
+![Two shiny metals spheres flanking a blue sphere on top of a yellow-ish sphere](samples/pngs/materials.png)  
