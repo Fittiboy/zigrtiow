@@ -116,3 +116,8 @@ In addition to the original lambertian diffuse reflector, there is now
 also metal!  
 
 ![Two shiny metals spheres flanking a blue sphere on top of a yellow-ish sphere](samples/pngs/materials.png)  
+
+At the end of the chapter, fuzzy reflections were introduced, enabling
+spheres to look like this.  
+
+![Two fuzzy, shiny metal spheres flanking a blue sphere on dtop of a yellow-ish sphere](samples/pngs/fuzzy_reflection.png)  

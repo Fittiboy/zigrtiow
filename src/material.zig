@@ -1,6 +1,7 @@
 const std = @import("std");
 
 const root = @import("root.zig");
+const E = root.E;
 const Ray = root.Ray;
 const Collision = root.Collision;
 const Color = root.Color;
@@ -23,8 +24,8 @@ pub const Material = union(enum) {
         return .{ .lambertian = .{ .albedo = albedo } };
     }
 
-    pub fn metal(albedo: Vec3) Self {
-        return .{ .metal = .{ .albedo = albedo } };
+    pub fn metal(albedo: Vec3, fuzz: E) Self {
+        return .{ .metal = .{ .albedo = albedo, .fuzz = fuzz } };
     }
 
     pub fn scatter(

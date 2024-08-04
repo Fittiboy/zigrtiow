@@ -18,8 +18,8 @@ pub fn main() !void {
     const materials: [4]Material = .{
         Material.lambertian(Vec3.init(0.8, 0.8, 0.0)), // ground
         Material.lambertian(Vec3.init(0.1, 0.2, 0.5)), // center
-        Material.metal(Vec3.init(0.8, 0.8, 0.8)), // left
-        Material.metal(Vec3.init(0.8, 0.6, 0.2)), // right
+        Material.metal(Vec3.init(0.8, 0.8, 0.8), 0.3), // left
+        Material.metal(Vec3.init(0.8, 0.6, 0.2), 1.0), // right
     };
     const MatCount = RefCounted(Material);
     const mat_refs = try allocator.alloc(MatCount, 4);
