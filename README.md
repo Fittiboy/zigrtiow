@@ -93,3 +93,9 @@ small values of `t`.
 Here is the result of that fix.  
 
 ![Two gray sphere, lighter and smoother than before](samples/pngs/fix_acne.png)  
+
+After implementing this simple uniform reflection, it was replaced with
+more realistic lambertian reflection instead, which resulted in this
+image.  
+
+![Two gray spheres, lightly shaded](samples/pngs/first_lambertian.png)  
