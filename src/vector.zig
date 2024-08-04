@@ -21,6 +21,24 @@ pub fn fromArray(xyz: [3]E) Self {
     };
 }
 
+pub fn random(rand: std.Random) Self {
+    return .{ .vec = V{ rand.float(E), rand.float(E), rand.float(E) } };
+}
+
+pub fn randomRange(rand: std.Random, min: E, max: E) Self {
+    const vx = root.randomRange(rand, min, max);
+    const vy = root.randomRange(rand, min, max);
+    const vz = root.randomRange(rand, min, max);
+    return .{ .vec = V{ vx, vy, vz } };
+}
+
+pub fn randomInUnitSphere(rand: std.Random) Self {
+    while (true) {
+        const vec = Self.randomRange(rand, -1, 1);
+        if (vec.lengthSquared() < 1) return vec;
+    }
+}
+
 pub inline fn x(self: Self) E {
     return self.vec[0];
 }
@@ -120,6 +138,43 @@ pub fn distanceTo(self: Self, destination: Self) E {
 
 pub fn directionTo(self: Self, destination: Self) Self {
     return self.to(destination).normed();
+}
+
+test random {
+    var prng = try root.rng();
+    const rand = prng.random();
+
+    for (0..1000) |_| {
+        const rand_vec = Self.random(rand);
+        try testing.expect(rand_vec.x() >= 0 and rand_vec.x() < 1);
+        try testing.expect(rand_vec.y() >= 0 and rand_vec.y() < 1);
+        try testing.expect(rand_vec.z() >= 0 and rand_vec.z() < 1);
+    }
+}
+
+test randomRange {
+    const min = 100;
+    const max = 255;
+    var prng = try root.rng();
+    const rand = prng.random();
+
+    for (0..1000) |_| {
+        const rand_vec = Self.randomRange(rand, min, max);
+        try testing.expect(rand_vec.x() >= min and rand_vec.x() < max);
+        try testing.expect(rand_vec.y() >= min and rand_vec.y() < max);
+        try testing.expect(rand_vec.z() >= min and rand_vec.z() < max);
+    }
+}
+
+test randomInUnitSphere {
+    var prng = try root.rng();
+    const rand = prng.random();
+
+    for (0..1000) |_| {
+        const vec = Self.randomInUnitSphere(rand);
+
+        try testing.expect(vec.lengthSquared() < 1);
+    }
 }
 
 test to {

@@ -85,11 +85,7 @@ fn rayColor(ray: Ray, world: HittableList) Vec3 {
 }
 
 pub fn render(self: Self, world: HittableList, writer: anytype) !void {
-    var prng = std.Random.DefaultPrng.init(blk: {
-        var seed: usize = undefined;
-        try std.posix.getrandom(std.mem.asBytes(&seed));
-        break :blk seed;
-    });
+    var prng = try root.rng();
     const rand = prng.random();
     // We render the image in the
     // [PPM](https://en.wikipedia.org/wiki/Netpbm#PPM_example) format.

@@ -29,6 +29,19 @@ pub inline fn degToRad(degrees: E) E {
     return degrees * pi / 180.0;
 }
 
+pub fn rng() !std.Random.Xoshiro256 {
+    return std.Random.DefaultPrng.init(blk: {
+        var seed: usize = undefined;
+        try std.posix.getrandom(std.mem.asBytes(&seed));
+        break :blk seed;
+    });
+}
+
+pub fn randomRange(rand: std.Random, min: E, max: E) E {
+    std.debug.assert(max - min >= 0);
+    return min + (max - min) * rand.float(E);
+}
+
 test {
     testing.refAllDecls(@import("camera.zig"));
     testing.refAllDecls(@import("vector.zig"));
