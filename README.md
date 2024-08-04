@@ -99,3 +99,8 @@ more realistic lambertian reflection instead, which resulted in this
 image.  
 
 ![Two gray spheres, lightly shaded](samples/pngs/first_lambertian.png)  
+
+Setting the reflectance to 10%, 30%, 50%, 70%, and finally 90% shows the
+gamut of the renderer.  
+
+![Five versions of the spheres overlaid, at different brightness levels](samples/pngs/original_gamut.png)  
