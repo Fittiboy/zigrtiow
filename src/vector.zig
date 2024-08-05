@@ -52,6 +52,30 @@ pub fn reflected(self: Self, normal: Self) Self {
     return self.sub(normal.mulScalar(2 * self.dot(normal)));
 }
 
+pub fn refract(self: Self, normal: Self, ref_index_eff: E) Self {
+    const dir = self.normed();
+    const cos = dir.dot(normal);
+    const sin = @sqrt(1 - cos * cos);
+    if (ref_index_eff * sin > 1.0) {
+        return dir.reflected(normal);
+    }
+    // Subtract the part parallel to the normal to get the part that
+    // is perpendicular to it. As the vector is normed, this is
+    // exactly of length sin(theta).
+    const perp = dir.sub(normal.mulScalar(cos))
+    // Multiplying sin(theta) by the effective refractive index gives
+    // us, according to Snell's law, sin(theta'), which is exactly
+    // the length of the part of the refracted ray perpendicular to
+    // the surface normal.
+        .mulScalar(ref_index_eff);
+    // The vector has to be length 1, so we can make use of the fact
+    // that parallel² + perpendicular² = 1, from which follows:
+    // parallel = √(1 - perpendicular²). This is the length, which
+    // points in the direction opposite the normal, so we flip it.
+    const parr = normal.mulScalar(-@sqrt(1 - perp.lengthSquared()));
+    return perp.add(parr);
+}
+
 pub inline fn x(self: Self) E {
     return self.vec[0];
 }
@@ -226,6 +250,18 @@ test reflected {
     const expected = Self.init(1, 1, 0);
 
     try testing.expectEqual(expected, ref);
+}
+
+test refract {
+    const in = Self.init(1, -1, 0).normed();
+    const normal = Self.init(0, 1, 0);
+    const ref_index_eff = 2.0 / 3.0;
+    const refracted = in.refract(normal, ref_index_eff);
+    const expected = Self.init(2.0 / (3.0 * @sqrt(2.0)), -@sqrt(7.0) / 3.0, 0);
+
+    try testing.expectApproxEqAbs(expected.x(), refracted.x(), 0.0001);
+    try testing.expectApproxEqAbs(expected.y(), refracted.y(), 0.0001);
+    try testing.expectApproxEqAbs(expected.z(), refracted.z(), 0.0001);
 }
 
 test to {

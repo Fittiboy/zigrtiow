@@ -120,4 +120,17 @@ also metal!
 At the end of the chapter, fuzzy reflections were introduced, enabling
 spheres to look like this.  
 
-![Two fuzzy, shiny metal spheres flanking a blue sphere on dtop of a yellow-ish sphere](samples/pngs/fuzzy_reflection.png)  
+![Two fuzzy, shiny metal spheres flanking a blue sphere on top of a yellow-ish sphere](samples/pngs/fuzzy_reflection.png)  
+
+## 11. Dielectrics
+This chapter introduced dielectrics, which can refract light, instead of
+reflecting it.  
+The first refractive material introduced is glass.  
+
+![A glass sphere, a blue sphere, and a shiny metal sphere on top of a yellow-ish sphere](samples/pngs/first_glass.png)  
+
+Before moving on in the book, I decided to try to place a second sphere
+inside the glass sphere, with the inverse of the glass' refractive index,
+to see what that would look like.  
+
+![A hollow glass sphere, a blue sphere, and a shiny metal sphere on top of a yellow-ish sphere](samples/pngs/experimental_hollow_glass.png)  

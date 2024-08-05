@@ -15,10 +15,11 @@ pub fn main() !void {
     var world = try HittableList.init(allocator);
     defer world.deinit();
 
-    const materials: [4]Material = .{
+    const materials = [_]Material{
         Material.lambertian(Vec3.init(0.8, 0.8, 0.0)), // ground
         Material.lambertian(Vec3.init(0.1, 0.2, 0.5)), // center
-        Material.metal(Vec3.init(0.8, 0.8, 0.8), 0.3), // left
+        Material.dielectric(1.5), // left outer
+        Material.dielectric(1.0 / 1.5), // left inner
         Material.metal(Vec3.init(0.8, 0.6, 0.2), 1.0), // right
     };
     const MatCount = RefCounted(Material);
@@ -34,13 +35,16 @@ pub fn main() !void {
     defer ground.deinit();
     const center = Hittable.initSphere(.{ 0.0, 0, -1.2 }, 0.5, mat_refs[1]);
     defer center.deinit();
-    const left = Hittable.initSphere(.{ -1.0, 0, -1.0 }, 0.5, mat_refs[2]);
-    defer left.deinit();
-    const right = Hittable.initSphere(.{ 1.0, 0, -1.0 }, 0.5, mat_refs[3]);
+    const left_outer = Hittable.initSphere(.{ -1.0, 0, -1.0 }, 0.5, mat_refs[2]);
+    defer left_outer.deinit();
+    const left_inner = Hittable.initSphere(.{ -1.0, 0, -1.0 }, 0.45, mat_refs[3]);
+    defer left_inner.deinit();
+    const right = Hittable.initSphere(.{ 1.0, 0, -1.0 }, 0.5, mat_refs[4]);
     defer right.deinit();
     try world.add(ground);
     try world.add(center);
-    try world.add(left);
+    try world.add(left_outer);
+    try world.add(left_inner);
     try world.add(right);
 
     const width = 400;

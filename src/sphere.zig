@@ -38,14 +38,14 @@ pub fn collisionAt(self: Self, interval: Interval, ray: Ray) ?Collision {
     const first = (b - sqrt) / a;
     const second = (b + sqrt) / a;
 
-    var face = Collision.Face.front;
-    const t = if (!interval.surrounds(first)) blk: {
-        if (!interval.surrounds(second)) return null;
-        face = .back;
-        break :blk second;
-    } else first;
+    const t = if (interval.surrounds(first)) first else second;
+    if (!interval.surrounds(t)) return null;
     var normal = self.normalAt(ray.at(t));
-    if (t == second) normal = normal.mulScalar(-1);
+    var face = Collision.Face.front;
+    if (ray.dir.dot(normal) > 0) {
+        normal = normal.mulScalar(-1);
+        face = .back;
+    }
 
     return Collision{
         .t = t,

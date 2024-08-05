@@ -9,6 +9,7 @@ const Vec3 = root.Vec3;
 
 pub const Lambertian = @import("materials/lambertian.zig");
 pub const Metal = @import("materials/metal.zig");
+pub const Dielectric = @import("materials/dielectric.zig");
 
 pub const ScatteredRay = struct {
     ray: Ray,
@@ -19,6 +20,7 @@ pub const Material = union(enum) {
     const Self = @This();
     lambertian: Lambertian,
     metal: Metal,
+    dielectric: Dielectric,
 
     pub fn lambertian(albedo: Vec3) Self {
         return .{ .lambertian = .{ .albedo = albedo } };
@@ -26,6 +28,10 @@ pub const Material = union(enum) {
 
     pub fn metal(albedo: Vec3, fuzz: E) Self {
         return .{ .metal = .{ .albedo = albedo, .fuzz = fuzz } };
+    }
+
+    pub fn dielectric(ref_index: E) Self {
+        return .{ .dielectric = .{ .ref_index = ref_index } };
     }
 
     pub fn scatter(
