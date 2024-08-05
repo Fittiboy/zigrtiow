@@ -134,3 +134,8 @@ inside the glass sphere, with the inverse of the glass' refractive index,
 to see what that would look like.  
 
 ![A hollow glass sphere, a blue sphere, and a shiny metal sphere on top of a yellow-ish sphere](samples/pngs/experimental_hollow_glass.png)  
+
+The Way the book tested the partial reflection of rays at shallow angles
+was to model the sphere as an air bubble in water.  
+
+![An air bubble in water, a blue sphere, and a shiny metal sphere on top of a yellow-ish sphere](samples/pngs/air_bubble.png)  
