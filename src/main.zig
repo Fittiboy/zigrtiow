@@ -26,7 +26,7 @@ pub fn main() !void {
         Material.metal(Vec3.init(0.8, 0.6, 0.2), 1.0), // right
     };
     const MatCount = RefCounted(Material);
-    const mat_refs = try allocator.alloc(MatCount, 4);
+    const mat_refs = try allocator.alloc(MatCount, 5);
     defer MatCount.free(mat_refs, allocator);
     for (materials, 0..mat_refs.len) |material, i| {
         const mat = try MatCount.create(allocator);

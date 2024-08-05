@@ -9,50 +9,61 @@ const Self = @This();
 const E = root.E;
 vec: V,
 
-pub fn init(vx: E, vy: E, vz: E) Self {
+pub inline fn init(vx: E, vy: E, vz: E) Self {
     return .{
         .vec = V{ vx, vy, vz },
     };
 }
 
-pub fn fromArray(xyz: [3]E) Self {
+pub inline fn fromArray(xyz: [3]E) Self {
     return .{
         .vec = V{ xyz[0], xyz[1], xyz[2] },
     };
 }
 
-pub fn random(rand: std.Random) Self {
+pub inline fn random(rand: std.Random) Self {
     return .{ .vec = V{ rand.float(E), rand.float(E), rand.float(E) } };
 }
 
-pub fn randomRange(rand: std.Random, min: E, max: E) Self {
+pub inline fn randomRange(rand: std.Random, min: E, max: E) Self {
     const vx = root.randomRange(rand, min, max);
     const vy = root.randomRange(rand, min, max);
     const vz = root.randomRange(rand, min, max);
     return .{ .vec = V{ vx, vy, vz } };
 }
 
-pub fn randomInUnitSphere(rand: std.Random) Self {
+pub inline fn randomInUnitSphere(rand: std.Random) Self {
     while (true) {
         const vec = Self.randomRange(rand, -1, 1);
         if (vec.lengthSquared() < 1) return vec;
     }
 }
 
-pub fn randomUnit(rand: std.Random) Self {
+pub inline fn randomInUnitDisk(rand: std.Random) Self {
+    while (true) {
+        const vec = Self.init(
+            root.randomRange(rand, -1, 1),
+            root.randomRange(rand, -1, 1),
+            0,
+        );
+        if (vec.lengthSquared() < 1) return vec;
+    }
+}
+
+pub inline fn randomUnit(rand: std.Random) Self {
     return Self.randomInUnitSphere(rand).normed();
 }
 
-pub fn randomOnHemisphere(rand: std.Random, normal: Self) Self {
+pub inline fn randomOnHemisphere(rand: std.Random, normal: Self) Self {
     const vec = Self.randomUnit(rand);
     if (vec.dot(normal) > 0) return vec else return vec.flipped();
 }
 
-pub fn reflected(self: Self, normal: Self) Self {
+pub inline fn reflected(self: Self, normal: Self) Self {
     return self.sub(normal.mulScalar(2 * self.dot(normal)));
 }
 
-pub fn refract(self: Self, normal: Self, ref_index_eff: E) Self {
+pub inline fn refract(self: Self, normal: Self, ref_index_eff: E) Self {
     const dir = self.normed();
     const cos = dir.dot(normal);
     // Subtract the part parallel to the normal to get the part that
@@ -84,59 +95,59 @@ pub inline fn z(self: Self) E {
     return self.vec[2];
 }
 
-pub fn add(self: Self, other: Self) Self {
+pub inline fn add(self: Self, other: Self) Self {
     return .{ .vec = self.vec + other.vec };
 }
 
-pub fn sub(self: Self, other: Self) Self {
+pub inline fn sub(self: Self, other: Self) Self {
     return .{ .vec = self.vec - other.vec };
 }
 
-pub fn mul(self: Self, other: Self) Self {
+pub inline fn mul(self: Self, other: Self) Self {
     return .{ .vec = self.vec * other.vec };
 }
 
-pub fn div(self: Self, other: Self) Self {
+pub inline fn div(self: Self, other: Self) Self {
     return .{ .vec = self.vec / other.vec };
 }
 
-pub fn addScalar(self: Self, scalar: E) Self {
+pub inline fn addScalar(self: Self, scalar: E) Self {
     return .{ .vec = self.vec + @as(V, @splat(scalar)) };
 }
 
-pub fn subScalar(self: Self, scalar: E) Self {
+pub inline fn subScalar(self: Self, scalar: E) Self {
     return .{ .vec = self.vec - @as(V, @splat(scalar)) };
 }
 
-pub fn mulScalar(self: Self, scalar: E) Self {
+pub inline fn mulScalar(self: Self, scalar: E) Self {
     return .{ .vec = self.vec * @as(V, @splat(scalar)) };
 }
 
-pub fn divScalar(self: Self, scalar: E) Self {
+pub inline fn divScalar(self: Self, scalar: E) Self {
     return .{ .vec = self.vec / @as(V, @splat(scalar)) };
 }
 
-pub fn lengthSquared(self: Self) E {
+pub inline fn lengthSquared(self: Self) E {
     return self.dot(self);
 }
 
-pub fn length(self: Self) E {
+pub inline fn length(self: Self) E {
     return @sqrt(lengthSquared(self));
 }
 
-pub fn normed(self: Self) Self {
+pub inline fn normed(self: Self) Self {
     return self.divScalar(self.length());
 }
 
-pub fn abs(self: Self) Self {
+pub inline fn abs(self: Self) Self {
     return Self{ .vec = @abs(self.vec) };
 }
 
-pub fn flipped(self: Self) Self {
+pub inline fn flipped(self: Self) Self {
     return self.mulScalar(-1);
 }
 
-pub fn positive(self: Self) Self {
+pub inline fn positive(self: Self) Self {
     return Self.init(
         @max(self.x(), 0),
         @max(self.y(), 0),
@@ -144,7 +155,7 @@ pub fn positive(self: Self) Self {
     );
 }
 
-pub fn negative(self: Self) Self {
+pub inline fn negative(self: Self) Self {
     return Self.init(
         @min(self.x(), 0),
         @min(self.y(), 0),
@@ -152,11 +163,11 @@ pub fn negative(self: Self) Self {
     );
 }
 
-pub fn dot(u: Self, v: Self) E {
+pub inline fn dot(u: Self, v: Self) E {
     return @reduce(.Add, u.vec * v.vec);
 }
 
-pub fn cross(u: Self, v: Self) Self {
+pub inline fn cross(u: Self, v: Self) Self {
     const uv, const vv = .{ u.vec, v.vec };
     return .{ .vec = .{
         uv[1] * vv[2] - uv[2] * vv[1],
@@ -165,19 +176,19 @@ pub fn cross(u: Self, v: Self) Self {
     } };
 }
 
-pub fn to(self: Self, destination: Self) Self {
+pub inline fn to(self: Self, destination: Self) Self {
     return destination.sub(self);
 }
 
-pub fn distanceTo(self: Self, destination: Self) E {
+pub inline fn distanceTo(self: Self, destination: Self) E {
     return self.to(destination).length();
 }
 
-pub fn directionTo(self: Self, destination: Self) Self {
+pub inline fn directionTo(self: Self, destination: Self) Self {
     return self.to(destination).normed();
 }
 
-pub fn nearZero(self: Self) bool {
+pub inline fn nearZero(self: Self) bool {
     const s = 1e-8;
     return (@abs(self.x()) < s and @abs(self.y()) < s and @abs(self.z()) < s);
 }
@@ -217,6 +228,15 @@ test randomInUnitSphere {
 
         try testing.expect(vec.lengthSquared() < 1);
     }
+}
+
+test randomInUnitDisk {
+    var prng = try root.rng();
+    const rand = prng.random();
+    const vec = Self.randomInUnitDisk(rand);
+
+    try testing.expectEqual(0, vec.z());
+    try testing.expect(vec.length() < 1);
 }
 
 test randomUnit {
