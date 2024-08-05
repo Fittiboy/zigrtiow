@@ -16,7 +16,6 @@ const Interval = root.Interval;
 const Material = root.Material;
 
 const Self = @This();
-aspect_ratio: E,
 width: usize,
 samples_per_pixel: usize,
 max_depth: usize,
@@ -26,56 +25,73 @@ center: P3,
 pixel00_loc: P3,
 pixel_delta_u: Vec3,
 pixel_delta_v: Vec3,
+base: Base,
 
-pub const CameraConfig = struct {
+const Base = struct {
+    u: Vec3,
+    v: Vec3,
+    w: Vec3,
+};
+
+pub const Config = struct {
     aspect_ratio: E = 1.0,
     width: usize = 100,
     samples_per_pixel: usize = 10,
     max_depth: usize = 10,
     vfov: E = 90,
+    position: Position = .{},
+};
+
+pub const Position = struct {
+    look_from: P3 = P3.init(0, 0, 0),
+    look_at: P3 = P3.init(0, 0, -1),
+    v_up: Vec3 = Vec3.init(0, 1, 0),
 };
 
 pub fn init(
-    config: CameraConfig,
+    config: Config,
 ) Self {
     const width_f: f64 = @floatFromInt(config.width);
     const height = @max(@as(usize, @intFromFloat(width_f / config.aspect_ratio)), 1);
     const height_f: f64 = @floatFromInt(height);
-
-    const camera_center = P3.fromArray(.{ 0, 0, 0 });
+    const pos = config.position;
+    const look_dir = pos.look_from.to(pos.look_at).normed();
+    const w = look_dir.mulScalar(-1).normed();
+    const u = pos.v_up.cross(w).normed();
+    const v = w.cross(u);
 
     // Viewport dimensions based on vertical FOV
-    const focal_length = 1.0;
+    const focal_length = pos.look_from.to(pos.look_at).length();
     const theta = root.degToRad(config.vfov);
     const h = std.math.tan(theta / 2);
     const viewport_height: f64 = 2.0 * h * focal_length;
     const viewport_width: f64 = viewport_height * (width_f / height_f);
 
     // Horizontal (left->right) and vertical (top->bottom) viewport edges
-    const viewport_u = Vec3.fromArray(.{ viewport_width, 0, 0 });
-    const viewport_v = Vec3.fromArray(.{ 0, -viewport_height, 0 });
+    const viewport_u = u.mulScalar(viewport_width);
+    const viewport_v = v.mulScalar(-viewport_height);
 
     const pixel_delta_u = viewport_u.divScalar(width_f);
     const pixel_delta_v = viewport_v.divScalar(height_f);
 
-    const viewport_upper_left = camera_center
-        .sub(Vec3.fromArray(.{ 0, 0, focal_length }))
+    const viewport_upper_left = pos.look_from
+        .sub(w.mulScalar(focal_length))
         .sub(viewport_u.divScalar(2))
         .sub(viewport_v.divScalar(2));
     const pixel00_loc = viewport_upper_left
         .add(pixel_delta_u.add(pixel_delta_v).mulScalar(0.5));
 
     return Self{
-        .aspect_ratio = config.aspect_ratio,
         .width = config.width,
         .samples_per_pixel = config.samples_per_pixel,
         .pixel_sample_scale = 1.0 / @as(E, @floatFromInt(config.samples_per_pixel)),
         .max_depth = config.max_depth,
         .height = height,
-        .center = camera_center,
+        .center = pos.look_from,
         .pixel00_loc = pixel00_loc,
         .pixel_delta_u = pixel_delta_u,
         .pixel_delta_v = pixel_delta_v,
+        .base = .{ .u = u, .v = v, .w = w },
     };
 }
 
@@ -121,13 +137,14 @@ pub fn render(self: Self, world: HittableList, writer: anytype, logging: bool) !
 }
 
 fn getRay(self: Self, i: usize, j: usize, rand: std.Random) Ray {
-    const offset = sampleSquare(rand);
+    const offset = self.sampleSquare(rand);
     const sample = self.pixel00_loc
         .add(self.pixel_delta_u.mulScalar(@as(E, @floatFromInt(i)) + offset.x()))
         .add(self.pixel_delta_v.mulScalar(@as(E, @floatFromInt(j)) + offset.y()));
     return Ray.fromVecs(self.center, self.center.to(sample));
 }
 
-fn sampleSquare(rand: std.Random) Vec3 {
-    return Vec3.fromArray(.{ rand.float(E) - 0.5, rand.float(E) - 0.5, 0 });
+fn sampleSquare(self: Self, rand: std.Random) Vec3 {
+    return self.base.u.mulScalar(rand.float(E) - 0.5)
+        .add(self.base.v.mulScalar(rand.float(E) - 0.5));
 }

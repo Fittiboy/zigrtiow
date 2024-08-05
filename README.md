@@ -151,3 +151,13 @@ The next step in making the camera customizable is to change the field
 of view.  
 
 ![A large blue sphere and a large red sphere next to each other](samples/pngs/fov.png)  
+
+After making implementing arbitrary camera positions (and fixing a sign
+error), I was able to move the camera to wherever I want.  
+
+![The three-sphere scene from above and to the right, slightly rotated](samples/pngs/own_angle.png)  
+
+In the book itself, two other angles were used as examples.  
+
+![Three-sphere scene from above and afar](samples/pngs/custom_angle_1.png)
+![Three-sphere scene from above and close up](samples/pngs/custom_angle_2.png)  
