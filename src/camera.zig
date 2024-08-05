@@ -106,6 +106,79 @@ pub fn init(
     };
 }
 
+pub fn render(
+    comptime self: Self,
+    world: HittableList,
+    writer: anytype,
+    comptime num_threads: ?usize,
+    logging: bool,
+) !void {
+    var prng = try root.rng();
+    const rand = prng.random();
+
+    // We render the image in the
+    // [PPM](https://en.wikipedia.org/wiki/Netpbm#PPM_example) format.
+    const max_color = 255;
+    try writer.print("P3\n{d} {d}\n{d}\n", .{ self.width, self.height, max_color });
+
+    const thread_count = num_threads orelse 1;
+    const samples_per_thread = self.samples_per_pixel / thread_count;
+    // Ensure each thread has the same amount of work
+    comptime std.debug.assert(
+        samples_per_thread * thread_count == self.samples_per_pixel,
+    );
+    var threads: [thread_count]std.Thread = undefined;
+    var colors: [threads.len][self.width]Vec3 = undefined;
+
+    for (0..self.height) |j| {
+        if (logging) print("\rScanlines remaining: {d: >5}", .{self.height - j});
+
+        for (0..threads.len) |t| {
+            threads[t] = try std.Thread.spawn(.{}, renderRow, .{
+                self,
+                rand,
+                j,
+                samples_per_thread,
+                world,
+                &colors[t],
+            });
+        }
+        for (0..threads.len) |t| {
+            threads[t].join();
+        }
+
+        for (0..self.width) |i| {
+            var color_value = Vec3.fromArray(.{ 0, 0, 0 });
+            for (0..thread_count) |t| {
+                color_value = color_value.add(colors[t][i]);
+            }
+            const color = Color.fromVec3(color_value);
+            try color.writeTo(writer);
+            try writer.writeAll(if (i + 1 < self.width) "\t" else "\n");
+        }
+    }
+    if (logging) print("\r{s: <26}\n", .{"Done!"});
+}
+
+fn renderRow(
+    self: Self,
+    rand: std.Random,
+    j: usize,
+    samples: usize,
+    world: HittableList,
+    arr: []Vec3,
+) void {
+    for (0..self.width) |i| {
+        var color_value = Vec3.fromArray(.{ 0, 0, 0 });
+        for (0..samples) |_| {
+            const ray = self.getRay(i, j, rand);
+            color_value = color_value.add(rayColorValue(rand, ray, world, self.max_depth));
+        }
+        const averaged = color_value.mulScalar(self.pixel_sample_scale);
+        arr[i] = averaged;
+    }
+}
+
 fn rayColorValue(rand: std.Random, ray: Ray, world: HittableList, depth: usize) Vec3 {
     if (depth == 0) return Vec3.init(0, 0, 0);
 
@@ -120,31 +193,6 @@ fn rayColorValue(rand: std.Random, ray: Ray, world: HittableList, depth: usize) 
     const white = Vec3.fromArray(.{ 1.0, 1.0, 1.0 });
     const blue = Vec3.fromArray(.{ 0.5, 0.7, 1.0 });
     return white.lerp(blue, a);
-}
-
-pub fn render(self: Self, world: HittableList, writer: anytype, logging: bool) !void {
-    var prng = try root.rng();
-    const rand = prng.random();
-    // We render the image in the
-    // [PPM](https://en.wikipedia.org/wiki/Netpbm#PPM_example) format.
-    const max_color = 255;
-    try writer.print("P3\n{d} {d}\n{d}\n", .{ self.width, self.height, max_color });
-
-    for (0..self.height) |j| {
-        if (logging) print("\rScanlines remaining: {d: >5}", .{self.height - j});
-        for (0..self.width) |i| {
-            var color_value = Vec3.fromArray(.{ 0, 0, 0 });
-            for (0..self.samples_per_pixel) |_| {
-                const ray = self.getRay(i, j, rand);
-                color_value = color_value.add(rayColorValue(rand, ray, world, self.max_depth));
-            }
-            const averaged = color_value.mulScalar(self.pixel_sample_scale);
-            const color = Color.fromVec3(averaged);
-            try color.writeTo(writer);
-            try writer.writeAll(if (i + 1 < self.width) "\t" else "\n");
-        }
-    }
-    if (logging) print("\r{s: <26}\n", .{"Done!"});
 }
 
 fn getRay(self: Self, i: usize, j: usize, rand: std.Random) Ray {

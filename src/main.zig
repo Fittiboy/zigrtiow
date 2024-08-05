@@ -56,29 +56,31 @@ pub fn main() !void {
 
     const mat2 = try Material.lambertian(Vec3.init(0.4, 0.2, 0.1)).counted(allocator);
     defer mat2.deinit();
-    try world.add(Hittable.initSphere(.{ -4, 1, 0 }, 1.0, mat2));
+    try world.add(Hittable.initSphere(.{ -4, 1, 0 }, 1.0, mat1));
 
     const mat3 = try Material.metal(Vec3.init(0.7, 0.6, 0.5), 0.0).counted(allocator);
     defer mat3.deinit();
-    try world.add(Hittable.initSphere(.{ 4, 1, 0 }, 1.0, mat3));
+    try world.add(Hittable.initSphere(.{ 4, 1, 0 }, 1.0, mat1));
 
-    const camera = Camera.init(.{
-        .aspect_ratio = 16.0 / 9.0,
-        .width = 7680,
-        .samples_per_pixel = 500,
-        .max_depth = 50,
-        .vfov = 20,
-        .defocus_angle = 0.6,
-        .focus_dist = 10.0,
-        .position = .{
-            .look_from = P3.init(13, 2, 3),
-            .look_at = P3.init(0, 0, 0),
-            .v_up = Vec3.init(0, 1, 0),
-        },
-    });
+    const camera = comptime blk: {
+        break :blk Camera.init(.{
+            .aspect_ratio = 16.0 / 9.0,
+            .width = 7680,
+            .samples_per_pixel = 500,
+            .max_depth = 50,
+            .vfov = 20,
+            .defocus_angle = 0.6,
+            .focus_dist = 10.0,
+            .position = .{
+                .look_from = P3.init(13, 2, 3),
+                .look_at = P3.init(0, 0, 0),
+                .v_up = Vec3.init(0, 1, 0),
+            },
+        });
+    };
 
     var stdout = std.io.getStdOut();
     var buffered = std.io.bufferedWriter(stdout.writer());
-    try camera.render(world, buffered.writer(), true);
+    try camera.render(world, buffered.writer(), 20, true);
     try buffered.flush();
 }
