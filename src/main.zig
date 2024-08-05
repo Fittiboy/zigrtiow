@@ -64,7 +64,7 @@ pub fn main() !void {
 
     const camera = Camera.init(.{
         .aspect_ratio = 16.0 / 9.0,
-        .width = 1200,
+        .width = 7680,
         .samples_per_pixel = 500,
         .max_depth = 50,
         .vfov = 20,
