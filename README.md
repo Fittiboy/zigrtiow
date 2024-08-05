@@ -185,3 +185,9 @@ So there's an even more final render, with all three of the big spheres
 made of glass!  
 
 ![A collection of spheres, with three large glass spheres](samples/pngs/final_all_glass.png)  
+
+
+## ??. The 8K Render
+Not sure why I did this.  
+
+![An 8K resolution render of a collection of spheres](samples/pngs/8K.png)  
