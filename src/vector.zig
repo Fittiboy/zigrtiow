@@ -55,10 +55,6 @@ pub fn reflected(self: Self, normal: Self) Self {
 pub fn refract(self: Self, normal: Self, ref_index_eff: E) Self {
     const dir = self.normed();
     const cos = dir.dot(normal);
-    const sin = @sqrt(1 - cos * cos);
-    if (ref_index_eff * sin > 1.0) {
-        return dir.reflected(normal);
-    }
     // Subtract the part parallel to the normal to get the part that
     // is perpendicular to it. As the vector is normed, this is
     // exactly of length sin(theta).

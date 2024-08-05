@@ -139,3 +139,9 @@ The Way the book tested the partial reflection of rays at shallow angles
 was to model the sphere as an air bubble in water.  
 
 ![An air bubble in water, a blue sphere, and a shiny metal sphere on top of a yellow-ish sphere](samples/pngs/air_bubble.png)  
+
+After introducing Schlick's approximation for reflectance, the book uses
+a hollow glass sphere to show this, which is exactly what I did myself
+two picture above from here, except now with reflectance.  
+
+![A hollow glass sphere, a blue sphere, and a shiny metal sphere on top of a yellow-ish sphere](samples/pngs/schlick_approx.png)  
