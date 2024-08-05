@@ -26,6 +26,9 @@ pixel00_loc: P3,
 pixel_delta_u: Vec3,
 pixel_delta_v: Vec3,
 base: Base,
+defocus_angle: E,
+defocus_dist_u: Vec3,
+defocus_dist_v: Vec3,
 
 const Base = struct {
     u: Vec3,
@@ -40,6 +43,8 @@ pub const Config = struct {
     max_depth: usize = 10,
     vfov: E = 90,
     position: Position = .{},
+    defocus_angle: E = 0,
+    focus_dist: E = 10,
 };
 
 pub const Position = struct {
@@ -61,10 +66,9 @@ pub fn init(
     const v = w.cross(u);
 
     // Viewport dimensions based on vertical FOV
-    const focal_length = pos.look_from.to(pos.look_at).length();
     const theta = root.degToRad(config.vfov);
     const h = std.math.tan(theta / 2);
-    const viewport_height: f64 = 2.0 * h * focal_length;
+    const viewport_height: f64 = 2.0 * h * config.focus_dist;
     const viewport_width: f64 = viewport_height * (width_f / height_f);
 
     // Horizontal (left->right) and vertical (top->bottom) viewport edges
@@ -75,11 +79,15 @@ pub fn init(
     const pixel_delta_v = viewport_v.divScalar(height_f);
 
     const viewport_upper_left = pos.look_from
-        .sub(w.mulScalar(focal_length))
+        .sub(w.mulScalar(config.focus_dist))
         .sub(viewport_u.divScalar(2))
         .sub(viewport_v.divScalar(2));
     const pixel00_loc = viewport_upper_left
         .add(pixel_delta_u.add(pixel_delta_v).mulScalar(0.5));
+
+    // Calculate the camera defocus disk basis
+    const defocus_radius = config.focus_dist *
+        std.math.tan(root.degToRad(config.defocus_angle / 2));
 
     return Self{
         .width = config.width,
@@ -92,6 +100,9 @@ pub fn init(
         .pixel_delta_u = pixel_delta_u,
         .pixel_delta_v = pixel_delta_v,
         .base = .{ .u = u, .v = v, .w = w },
+        .defocus_angle = config.defocus_angle,
+        .defocus_dist_u = u.mulScalar(defocus_radius),
+        .defocus_dist_v = v.mulScalar(defocus_radius),
     };
 }
 
@@ -137,14 +148,25 @@ pub fn render(self: Self, world: HittableList, writer: anytype, logging: bool) !
 }
 
 fn getRay(self: Self, i: usize, j: usize, rand: std.Random) Ray {
+    // Ray originates on the defocus disk and is directed at a point
+    // randomly samples around the pixel location i, j.
+
+    const center = if (self.defocus_angle <= 0) self.center else self.defocusDiskSample(rand);
     const offset = self.sampleSquare(rand);
     const sample = self.pixel00_loc
         .add(self.pixel_delta_u.mulScalar(@as(E, @floatFromInt(i)) + offset.x()))
         .add(self.pixel_delta_v.mulScalar(@as(E, @floatFromInt(j)) + offset.y()));
-    return Ray.fromVecs(self.center, self.center.to(sample));
+    return Ray.fromVecs(center, center.to(sample));
 }
 
 fn sampleSquare(self: Self, rand: std.Random) Vec3 {
     return self.base.u.mulScalar(rand.float(E) - 0.5)
         .add(self.base.v.mulScalar(rand.float(E) - 0.5));
+}
+
+fn defocusDiskSample(self: Self, rand: std.Random) P3 {
+    const p = Vec3.randomInUnitDisk(rand);
+    return self.center
+        .add(self.defocus_dist_u.mulScalar(p.x()))
+        .add(self.defocus_dist_v.mulScalar(p.y()));
 }

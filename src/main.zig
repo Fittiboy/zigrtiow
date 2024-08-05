@@ -56,6 +56,8 @@ pub fn main() !void {
         .samples_per_pixel = 100,
         .max_depth = 50,
         .vfov = 20,
+        .defocus_angle = 10.0,
+        .focus_dist = 3.4,
         .position = .{
             .look_from = P3.init(-2, 2, 1),
             .look_at = P3.init(0, 0, -1.0),

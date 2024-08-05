@@ -165,3 +165,11 @@ In the book itself, two other angles were used as examples.
 Experimenting a bit, I think this is my favorite angle.  
 
 ![Three-sphere scene from slightly below and close-up](samples/pngs/coolest_angle.png)  
+
+## 13. Defocus Blur
+One final feature the book introduces is defocus blur, which emits rays
+not from the center of the camera, but from a small disk around the
+center instead.  
+Resulting images have a nice blur.  
+
+![Three spheres, two of which are out of focus](samples/pngs/defocus_blur.png)  
