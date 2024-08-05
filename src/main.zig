@@ -57,7 +57,7 @@ pub fn main() !void {
         .max_depth = 50,
         .vfov = 20,
         .position = .{
-            .look_from = P3.init(-2, 2, 1),
+            .look_from = P3.init(-2, -0.25, 1),
             .look_at = P3.init(0, 0, -1.0),
             .v_up = Vec3.init(0, 1, 0),
         },

@@ -161,3 +161,7 @@ In the book itself, two other angles were used as examples.
 
 ![Three-sphere scene from above and afar](samples/pngs/custom_angle_1.png)
 ![Three-sphere scene from above and close up](samples/pngs/custom_angle_2.png)  
+
+Experimenting a bit, I think this is my favorite angle.  
+
+![Three-sphere scene from slightly below and close-up](samples/pngs/coolest_angle.png)  
