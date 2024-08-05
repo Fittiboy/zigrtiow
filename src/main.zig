@@ -71,25 +71,15 @@ pub fn main() !void {
     // try world.add(left_inner);
     // try world.add(right);
 
-    const aspect = 16.0 / 9.0;
-    const width = 400;
-    const samples_per_pixel = 100;
-    const bounce_depth = 50;
-    const vfov = 90;
-    const camera = blk: {
-        var camera = Camera.init(
-            aspect,
-            width,
-            samples_per_pixel,
-            bounce_depth,
-            vfov,
-        );
-        camera.logging = true;
-        break :blk camera;
-    };
+    const camera = Camera.init(.{
+        .aspect_ratio = 16.0 / 9.0,
+        .width = 400,
+        .samples_per_pixel = 100,
+        .max_depth = 50,
+    });
 
     var stdout = std.io.getStdOut();
     var buffered = std.io.bufferedWriter(stdout.writer());
-    try camera.render(world, buffered.writer());
+    try camera.render(world, buffered.writer(), true);
     try buffered.flush();
 }

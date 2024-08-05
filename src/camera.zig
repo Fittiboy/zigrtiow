@@ -16,44 +16,37 @@ const Interval = root.Interval;
 const Material = root.Material;
 
 const Self = @This();
-// Manually set
-aspect_ratio: E = 1.0,
-width: usize = 100,
-samples_per_pixel: usize = 10,
-max_depth: usize = 10,
-vfov: E = 90,
-
-// Calculated
+aspect_ratio: E,
+width: usize,
+samples_per_pixel: usize,
+max_depth: usize,
 pixel_sample_scale: E,
 height: usize,
 center: P3,
 pixel00_loc: P3,
 pixel_delta_u: Vec3,
 pixel_delta_v: Vec3,
-logging: bool = false,
+
+pub const CameraConfig = struct {
+    aspect_ratio: E = 1.0,
+    width: usize = 100,
+    samples_per_pixel: usize = 10,
+    max_depth: usize = 10,
+    vfov: E = 90,
+};
 
 pub fn init(
-    aspect_ratio: ?E,
-    image_width: ?usize,
-    samples_per_pixel: ?usize,
-    bounce_depth: ?usize,
-    vfov: ?E,
+    config: CameraConfig,
 ) Self {
-    const ratio = aspect_ratio orelse 1.0;
-    const width = image_width orelse 100;
-    const samples = samples_per_pixel orelse 10;
-    const max_depth = bounce_depth orelse 10;
-    const fov = vfov orelse 90;
-
-    const width_f: f64 = @floatFromInt(width);
-    const height = @max(@as(usize, @intFromFloat(width_f / ratio)), 1);
+    const width_f: f64 = @floatFromInt(config.width);
+    const height = @max(@as(usize, @intFromFloat(width_f / config.aspect_ratio)), 1);
     const height_f: f64 = @floatFromInt(height);
 
     const camera_center = P3.fromArray(.{ 0, 0, 0 });
 
     // Viewport dimensions based on vertical FOV
     const focal_length = 1.0;
-    const theta = root.degToRad(fov);
+    const theta = root.degToRad(config.vfov);
     const h = std.math.tan(theta / 2);
     const viewport_height: f64 = 2.0 * h * focal_length;
     const viewport_width: f64 = viewport_height * (width_f / height_f);
@@ -73,11 +66,11 @@ pub fn init(
         .add(pixel_delta_u.add(pixel_delta_v).mulScalar(0.5));
 
     return Self{
-        .aspect_ratio = ratio,
-        .width = width,
-        .samples_per_pixel = samples,
-        .pixel_sample_scale = 1.0 / @as(E, @floatFromInt(samples)),
-        .max_depth = max_depth,
+        .aspect_ratio = config.aspect_ratio,
+        .width = config.width,
+        .samples_per_pixel = config.samples_per_pixel,
+        .pixel_sample_scale = 1.0 / @as(E, @floatFromInt(config.samples_per_pixel)),
+        .max_depth = config.max_depth,
         .height = height,
         .center = camera_center,
         .pixel00_loc = pixel00_loc,
@@ -102,7 +95,7 @@ fn rayColorValue(rand: std.Random, ray: Ray, world: HittableList, depth: usize) 
     return white.lerp(blue, a);
 }
 
-pub fn render(self: Self, world: HittableList, writer: anytype) !void {
+pub fn render(self: Self, world: HittableList, writer: anytype, logging: bool) !void {
     var prng = try root.rng();
     const rand = prng.random();
     // We render the image in the
@@ -111,7 +104,7 @@ pub fn render(self: Self, world: HittableList, writer: anytype) !void {
     try writer.print("P3\n{d} {d}\n{d}\n", .{ self.width, self.height, max_color });
 
     for (0..self.height) |j| {
-        if (self.logging) print("\rScanlines remaining: {d: >5}", .{self.height - j});
+        if (logging) print("\rScanlines remaining: {d: >5}", .{self.height - j});
         for (0..self.width) |i| {
             var color_value = Vec3.fromArray(.{ 0, 0, 0 });
             for (0..self.samples_per_pixel) |_| {
@@ -124,7 +117,7 @@ pub fn render(self: Self, world: HittableList, writer: anytype) !void {
             try writer.writeAll(if (i + 1 < self.width) "\t" else "\n");
         }
     }
-    if (self.logging) print("\r{s: <26}\n", .{"Done!"});
+    if (logging) print("\r{s: <26}\n", .{"Done!"});
 }
 
 fn getRay(self: Self, i: usize, j: usize, rand: std.Random) Ray {
