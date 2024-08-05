@@ -145,3 +145,9 @@ a hollow glass sphere to show this, which is exactly what I did myself
 two picture above from here, except now with reflectance.  
 
 ![A hollow glass sphere, a blue sphere, and a shiny metal sphere on top of a yellow-ish sphere](samples/pngs/schlick_approx.png)  
+
+## 12. Positionable Camera
+The next step in making the camera customizable is to change the field
+of view.  
+
+![A large blue sphere and a large red sphere next to each other](samples/pngs/fov.png)  

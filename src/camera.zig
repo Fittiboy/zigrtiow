@@ -16,10 +16,14 @@ const Interval = root.Interval;
 const Material = root.Material;
 
 const Self = @This();
+// Manually set
 aspect_ratio: E = 1.0,
 width: usize = 100,
 samples_per_pixel: usize = 10,
 max_depth: usize = 10,
+vfov: E = 90,
+
+// Calculated
 pixel_sample_scale: E,
 height: usize,
 center: P3,
@@ -33,25 +37,25 @@ pub fn init(
     image_width: ?usize,
     samples_per_pixel: ?usize,
     bounce_depth: ?usize,
+    vfov: ?E,
 ) Self {
     const ratio = aspect_ratio orelse 1.0;
     const width = image_width orelse 100;
     const samples = samples_per_pixel orelse 10;
     const max_depth = bounce_depth orelse 10;
+    const fov = vfov orelse 90;
 
     const width_f: f64 = @floatFromInt(width);
-    const height: usize = blk: {
-        const h: usize = @intFromFloat(width_f / ratio);
-        break :blk if (h >= 1) h else 1;
-    };
+    const height = @max(@as(usize, @intFromFloat(width_f / ratio)), 1);
     const height_f: f64 = @floatFromInt(height);
 
     const camera_center = P3.fromArray(.{ 0, 0, 0 });
-    const focal_length = 1.0;
 
-    // The image's actual aspect ratio might not match chosen aspect ratio,
-    // so we use the actual values for the viewport aspect ratio.
-    const viewport_height: f64 = 2.0;
+    // Viewport dimensions based on vertical FOV
+    const focal_length = 1.0;
+    const theta = root.degToRad(fov);
+    const h = std.math.tan(theta / 2);
+    const viewport_height: f64 = 2.0 * h * focal_length;
     const viewport_width: f64 = viewport_height * (width_f / height_f);
 
     // Horizontal (left->right) and vertical (top->bottom) viewport edges
