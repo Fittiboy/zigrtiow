@@ -19,6 +19,9 @@ pub fn init(alloc: Allocator) !Self {
 }
 
 pub fn deinit(self: Self) void {
+    for (self.objects.items) |obj| {
+        obj.deinit();
+    }
     self.objects.deinit();
 }
 

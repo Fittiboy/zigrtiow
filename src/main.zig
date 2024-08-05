@@ -1,5 +1,7 @@
 const std = @import("std");
+
 const root = @import("root.zig");
+const E = root.E;
 const Vec3 = root.Vec3;
 const P3 = root.P3;
 const Camera = root.Camera;
@@ -18,49 +20,59 @@ pub fn main() !void {
     var world = try HittableList.init(allocator);
     defer world.deinit();
 
-    const materials = [_]Material{
-        Material.lambertian(Vec3.init(0.8, 0.8, 0.0)), // ground
-        Material.lambertian(Vec3.init(0.1, 0.2, 0.5)), // center
-        Material.dielectric(1.5), // left outer
-        Material.dielectric(1.0 / 1.5), // left inner
-        Material.metal(Vec3.init(0.8, 0.6, 0.2), 1.0), // right
-    };
-    const MatCount = RefCounted(Material);
-    const mat_refs = try allocator.alloc(MatCount, 5);
-    defer MatCount.free(mat_refs, allocator);
-    for (materials, 0..mat_refs.len) |material, i| {
-        const mat = try MatCount.create(allocator);
-        mat.data.value = material;
-        mat_refs[i] = mat;
-    }
+    const ground_mat = try Material.lambertian(Vec3.init(0.5, 0.5, 0.5)).counted(allocator);
+    defer ground_mat.deinit();
+    try world.add(Hittable.initSphere(.{ 0, -1000, 0 }, 1000, ground_mat));
 
-    const ground = Hittable.initSphere(.{ 0.0, -100.5, -1.0 }, 100, mat_refs[0]);
-    defer ground.deinit();
-    const center = Hittable.initSphere(.{ 0.0, 0, -1.2 }, 0.5, mat_refs[1]);
-    defer center.deinit();
-    const left_outer = Hittable.initSphere(.{ -1.0, 0, -1.0 }, 0.5, mat_refs[2]);
-    defer left_outer.deinit();
-    const left_inner = Hittable.initSphere(.{ -1.0, 0, -1.0 }, 0.4, mat_refs[3]);
-    defer left_inner.deinit();
-    const right = Hittable.initSphere(.{ 1.0, 0, -1.0 }, 0.5, mat_refs[4]);
-    defer right.deinit();
-    try world.add(ground);
-    try world.add(center);
-    try world.add(left_outer);
-    try world.add(left_inner);
-    try world.add(right);
+    var prng = try root.rng();
+    const rand = prng.random();
+    for (0..22) |a_pos| for (0..22) |b_pos| {
+        const a: f64 = @as(f64, @floatFromInt(a_pos)) - 11;
+        const b: f64 = @as(f64, @floatFromInt(b_pos)) - 11;
+        const choose_mat = rand.float(E);
+        const center = [_]E{ a + 0.9 * rand.float(E), 0.2, b + 0.9 * rand.float(E) };
+
+        if (P3.init(4, 0.2, 0).to(P3.fromArray(center)).length() > 0.9) {
+            const mat = try RefCounted(Material).create(allocator);
+            defer mat.deinit();
+
+            if (choose_mat < 0.8) {
+                const albedo = Vec3.random(rand).mul(Vec3.random(rand));
+                mat.data.value = Material.lambertian(albedo);
+            } else if (choose_mat < 0.95) {
+                const albedo = Vec3.randomRange(rand, 0.5, 1);
+                const fuzz = root.randomRange(rand, 0, 0.5);
+                mat.data.value = Material.metal(albedo, fuzz);
+            } else {
+                mat.data.value = Material.dielectric(1.5);
+            }
+            try world.add(Hittable.initSphere(center, 0.2, mat));
+        }
+    };
+
+    const mat1 = try Material.dielectric(1.5).counted(allocator);
+    defer mat1.deinit();
+    try world.add(Hittable.initSphere(.{ 0, 1, 0 }, 1.0, mat1));
+
+    const mat2 = try Material.lambertian(Vec3.init(0.4, 0.2, 0.1)).counted(allocator);
+    defer mat2.deinit();
+    try world.add(Hittable.initSphere(.{ -4, 1, 0 }, 1.0, mat2));
+
+    const mat3 = try Material.metal(Vec3.init(0.7, 0.6, 0.5), 0.0).counted(allocator);
+    defer mat3.deinit();
+    try world.add(Hittable.initSphere(.{ 4, 1, 0 }, 1.0, mat3));
 
     const camera = Camera.init(.{
         .aspect_ratio = 16.0 / 9.0,
-        .width = 400,
-        .samples_per_pixel = 100,
+        .width = 1200,
+        .samples_per_pixel = 500,
         .max_depth = 50,
         .vfov = 20,
-        .defocus_angle = 10.0,
-        .focus_dist = 3.4,
+        .defocus_angle = 0.6,
+        .focus_dist = 10.0,
         .position = .{
-            .look_from = P3.init(-2, 2, 1),
-            .look_at = P3.init(0, 0, -1.0),
+            .look_from = P3.init(13, 2, 3),
+            .look_at = P3.init(0, 0, 0),
             .v_up = Vec3.init(0, 1, 0),
         },
     });

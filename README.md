@@ -173,3 +173,15 @@ center instead.
 Resulting images have a nice blur.  
 
 ![Three spheres, two of which are out of focus](samples/pngs/defocus_blur.png)  
+
+## 14. Where Next?
+Before the book is over, there was one last render, which took about 12
+minutes on my system.  
+
+![A collection of spheres](samples/pngs/final_render.png)  
+
+But it wouldn't be a true final render if it was actually final.  
+So there's an even more final render, with all three of the big spheres
+made of glass!  
+
+![A collection of spheres, with three large glass spheres](samples/pngs/final_all_glass.png)  

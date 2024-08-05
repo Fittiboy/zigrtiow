@@ -6,6 +6,7 @@ const Ray = root.Ray;
 const Collision = root.Collision;
 const Color = root.Color;
 const Vec3 = root.Vec3;
+const RefCounted = root.RefCounted;
 
 pub const Lambertian = @import("materials/lambertian.zig");
 pub const Metal = @import("materials/metal.zig");
@@ -32,6 +33,12 @@ pub const Material = union(enum) {
 
     pub fn dielectric(ref_index: E) Self {
         return .{ .dielectric = .{ .ref_index = ref_index } };
+    }
+
+    pub fn counted(self: Self, allocator: std.mem.Allocator) !RefCounted(Self) {
+        const ref = try RefCounted(Self).create(allocator);
+        ref.data.value = self;
+        return ref;
     }
 
     pub fn scatter(
